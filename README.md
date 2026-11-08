@@ -1,7 +1,8 @@
 # TechZen — Site vitrine (landing page)
 
 Landing page de **TechZen** : création de sites web, référencement, e-commerce,
-analyse de données, réseaux informatiques, Windows Server et vidéosurveillance.
+analyse de données, réseaux informatiques, Windows Server, caméras de vidéosurveillance
+et **installation Starlink**.
 
 > « Créez un site web à votre image, performant et sur-mesure. »
 
@@ -40,9 +41,13 @@ demo/                    Démos réelles des projets, jouables dans le navigateu
 4. **Croissance / SEO** — visibilité, acquisition locale, conversion, SEO e-commerce
 5. **Méthode** — cadrage, conception, mise en ligne, mesure
 6. **Infrastructure** — amélioration d'un réseau existant, nouveau réseau,
-   Windows Server, sauvegardes, vidéosurveillance
-7. **Offres** — Présence / Croissance / E-commerce & IT
-8. **FAQ**, **Contact** (formulaire → WhatsApp) et pied de page
+   Windows Server, sauvegardes
+7. **Vidéosurveillance** — étude et plan de pose, câblage PoE, NVR et stockage,
+   accès mobile sécurisé, caméras Wi-Fi / sites isolés, maintenance
+8. **Installation Starlink** — vérification du site, fixation et câblage, mise en
+   service, réseau local et continuité (avec aperçu de liaison satellite)
+9. **Offres** — Présence / Croissance / E-commerce & IT
+10. **FAQ**, **Contact** (formulaire → WhatsApp) et pied de page
 
 ## Personnalisation rapide
 
@@ -58,7 +63,9 @@ var CONFIG = {
 
 * **Numéro WhatsApp** : tant qu'il est vide, tous les boutons WhatsApp
   basculent automatiquement vers un e-mail pré-rempli (aucun lien cassé).
-* **E-mail** : remplacez `contact@techzen.ci` (également présent dans `index.html`).
+  ⏳ À renseigner dès qu'il est disponible.
+* **E-mail** : remplacez `contact@techzen.ci` — adresse provisoire, également
+  présente dans `index.html` (liens `mailto:`). ⏳ À renseigner.
 * **Couleurs** : variables `--brand`, `--brand-soft`, `--grad` dans `styles.css`.
 * **Textes / offres / FAQ** : directement dans `index.html`.
 
@@ -81,12 +88,14 @@ serveur web (Apache, Nginx). Pour GitHub Pages, publiez la racine du dépôt.
 
 ## Projets présentés
 
-| Projet | Type | Démo | Code |
+| Projet | Type | Démo | En ligne |
 | --- | --- | --- | --- |
-| FinaTrack CI | Application de suivi budgétaire (PWA) | `demo/finatrack.html` · https://finnatrack.netlify.app | https://github.com/Bervellearnaud/finatrack |
-| VoxNote | Notes vocales & photos (PWA React) | `demo/voxnote/` | https://github.com/Bervellearnaud/VoxNote |
-| Paintball 2D | Arcade canvas | `demo/splat-arena.html` · https://painballvoom.netlify.app | https://github.com/Bervellearnaud/2DPrintDashBall |
-| Puzzle Studio | Jeu de puzzle hors-ligne | `demo/puzzle/` | https://github.com/Bervellearnaud/MYPUZZLE |
+| FinaTrack CI | Application de suivi budgétaire (PWA) | `demo/finatrack.html` | https://finnatrack.netlify.app |
+| VoxNote | Notes vocales & photos (PWA React) | `demo/voxnote/` | — |
+| Paintball 2D | Arcade canvas | `demo/splat-arena.html` | https://painballvoom.netlify.app |
+| Puzzle Studio | Jeu de puzzle hors-ligne | `demo/puzzle/` | — |
+
+> Les liens vers le code source et l'icône GitHub ont été retirés du site sur demande.
 
 Les démos sont des copies autonomes exécutées localement : les essais des
 visiteurs restent dans leur navigateur.
