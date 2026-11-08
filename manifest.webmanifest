@@ -1,0 +1,30 @@
+{
+  "name": "TechZen — Sites web, SEO & infrastructure IT",
+  "short_name": "TechZen",
+  "description": "Création de sites web et boutiques en ligne, référencement, analyse de données, réseaux informatiques, Windows Server et vidéosurveillance.",
+  "lang": "fr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f9fc",
+  "theme_color": "#0b1e2c",
+  "icons": [
+    {
+      "src": "assets/logo/techzen-mark-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/logo/techzen-mark.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logo/techzen-mark-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

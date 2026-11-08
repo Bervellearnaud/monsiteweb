@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Puzzle Studio — jeu de puzzle interactif : importez vos images, choisissez votre niveau (3×3 à 36×36) et assemblez les pièces !">
+<title>🧩 Puzzle Studio — Jeu de puzzle interactif</title>
+
+<style>
+/* ============================================================
+   1. DESIGN SYSTEM & VARIABLES
+   ============================================================ */
+:root{
+  --bg:#0a0e1a;
+  --text:#e9edfb;
+  --muted:#96a2c4;
+  --accent:#7c5cff;          /* violet principal   */
+  --accent2:#22d3ee;         /* cyan (indices)     */
+  --accent3:#f472b6;         /* rose (accents)     */
+  --glass:rgba(255,255,255,.06);
+  --glass-border:rgba(255,255,255,.10);
+  --radius:16px;
+  --tray-basis:340px;        /* largeur du plateau de réserves (modifiable en JS) */
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+html,body{ margin:0; padding:0; height:100%; }
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);
+  /* Fond dégradé multicouche */
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(124,92,255,.28), transparent 60%),
+    radial-gradient(1000px 600px at 110% 10%, rgba(34,211,238,.18), transparent 55%),
+    radial-gradient(900px 700px at 50% 130%, rgba(244,114,182,.16), transparent 60%),
+    var(--bg);
+  height:100vh;
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  /* Marge adaptée aux encoches / barres système des mobiles */
+  padding:max(14px, env(safe-area-inset-top))
+          max(16px, env(safe-area-inset-right))
+          max(14px, env(safe-area-inset-bottom))
+          max(16px, env(safe-area-inset-left));
+  overflow:hidden;                    /* l'app occupe exactement l'écran */
+  overscroll-behavior:none;           /* pas de rebond / pull-to-refresh */
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ============================================================
+   2. EN-TÊTE (marque + statistiques)
+   ============================================================ */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; flex:0 0 auto;
+}
+.brand{
+  font-size:1.35rem; font-weight:800; letter-spacing:.3px;
+  display:flex; align-items:center; gap:9px; white-space:nowrap;
+}
+.brand-emoji{ font-size:1.5rem; filter:drop-shadow(0 3px 8px rgba(124,92,255,.6)); }
+.grad{
+  background:linear-gradient(90deg,#a78bfa 0%,#22d3ee 50%,#f472b6 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.stats{ display:flex; gap:8px; flex-wrap:wrap; }
+.chip{
+  display:flex; align-items:center; gap:7px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  padding:7px 13px; border-radius:999px;
+  font-size:.88rem; font-weight:600;
+  font-variant-numeric:tabular-nums;         /* chiffres alignés */
+  white-space:nowrap;
+}
+.chip b{ font-weight:800; color:#fff; }
+
+/* ============================================================
+   3. BARRE D'OUTILS (actions + niveaux)
+   ============================================================ */
+.toolbar{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:10px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius); padding:10px;
+}
+.toolbar-group{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+.btn{
+  appearance:none; -webkit-appearance:none;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.07);
+  color:var(--text);
+  padding:9px 14px; border-radius:12px;
+  font:inherit; font-size:.87rem; font-weight:600;
+  cursor:pointer; white-space:nowrap;
+  display:inline-flex; align-items:center; gap:7px;
+  transition:background .18s ease, transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.btn:hover{ background:rgba(255,255,255,.14); transform:translateY(-1px); }
+.btn:active{ transform:scale(.97); }
+.btn:focus-visible{ outline:2px solid var(--accent2); outline-offset:2px; }
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 130%);
+  border-color:transparent; color:#fff;
+  box-shadow:0 6px 18px rgba(124,92,255,.35);
+}
+.btn-primary:hover{ box-shadow:0 9px 24px rgba(124,92,255,.5); background:linear-gradient(135deg,#8b6dff 0%,#3adcf5 130%); }
+.btn-icon{ padding:9px 11px; font-size:1rem; }
+
+/* Groupe de niveaux */
+.levels{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.lvl{
+  appearance:none; -webkit-appearance:none;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05); color:var(--muted);
+  padding:8px 12px; border-radius:999px;
+  font:inherit; font-size:.82rem; font-weight:700;
+  cursor:pointer; white-space:nowrap;
+  transition:.18s ease;
+}
+.lvl:hover{ color:var(--text); background:rgba(255,255,255,.12); transform:translateY(-1px); }
+.lvl.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  border-color:transparent; color:#fff;
+  box-shadow:0 5px 16px rgba(244,114,182,.35);
+}
+
+/* Barre de progression */
+.progress{
+  flex:0 0 auto; height:6px; border-radius:99px;
+  background:rgba(255,255,255,.07); overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.35);
+}
+#progressFill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+  border-radius:99px;
+  transition:width .4s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ============================================================
+   4. ZONE DE JEU (plateau + réserves)
+   ============================================================ */
+#playArea{
+  flex:1 1 auto; min-height:0; min-width:0;
+  display:flex; gap:14px;
+}
+
+/* --- Plateau central --- */
+#boardArea{
+  flex:1 1 auto; min-width:0; min-height:0;
+  display:grid; place-items:center;
+  position:relative; z-index:2;          /* au-dessus des réserves pour les animations */
+}
+#board{
+  position:relative;
+  border-radius:18px;
+  background:linear-gradient(160deg, rgba(22,28,56,.96), rgba(10,14,28,.98));
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.55),
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    inset 0 0 90px rgba(0,0,0,.4);
+}
+/* Grille d'emplacements vides */
+#slots{
+  position:absolute; inset:0; z-index:1;
+  display:grid; grid-template-columns:repeat(3,1fr);
+}
+.slot{
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.035);
+  transition:background .15s ease, box-shadow .15s ease;
+}
+/* Indice : emplacement surligné */
+.slot.hint{
+  background:rgba(34,211,238,.20);
+  box-shadow:inset 0 0 0 2px rgba(34,211,238,.95), 0 0 18px rgba(34,211,238,.55);
+  animation:pulse 1.05s ease-in-out infinite;
+  z-index:3;
+}
+@keyframes pulse{
+  50%{ box-shadow:inset 0 0 0 2px #22d3ee, 0 0 30px rgba(34,211,238,.9); }
+}
+
+/* --- Réserves (pièces à placer) --- */
+#tray{
+  flex:0 0 var(--tray-basis);
+  display:flex; flex-direction:column;
+  min-height:0; min-width:0;
+  position:relative; z-index:1;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:var(--radius); overflow:hidden;
+}
+.tray-head{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:10px 14px;
+  font-size:.78rem; font-weight:800; letter-spacing:.7px; text-transform:uppercase;
+  color:var(--muted);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.badge{
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  color:#fff; font-size:.75rem; font-weight:800;
+  padding:3px 9px; border-radius:99px;
+  font-variant-numeric:tabular-nums;
+}
+#trayViewport{
+  flex:1 1 auto; min-height:0;
+  overflow-y:auto; overflow-x:hidden;
+  position:relative;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(124,92,255,.55) transparent;
+}
+#trayViewport::-webkit-scrollbar{ width:9px; }
+#trayViewport::-webkit-scrollbar-track{ background:transparent; }
+#trayViewport::-webkit-scrollbar-thumb{
+  background:rgba(124,92,255,.5); border-radius:99px;
+  border:2px solid transparent; background-clip:content-box;
+}
+#trayViewport::-webkit-scrollbar-thumb:hover{ background:rgba(124,92,255,.8); background-clip:content-box; }
+#trayContent{ position:relative; width:100%; }
+
+/* ============================================================
+   5. PIÈCES DE PUZZLE
+   ============================================================ */
+.piece{
+  position:absolute; left:0; top:0;
+  z-index:2;
+  touch-action:none;                    /* le doigt glisse la pièce, il ne scrolle pas */
+  user-select:none; -webkit-user-select:none;
+  cursor:grab;
+}
+.piece.animating{
+  transition:transform .34s cubic-bezier(.2,.85,.25,1.04);   /* aimantation / retour élastique */
+}
+.piece.dragging{ z-index:50; cursor:grabbing; }
+
+/* La "peau" = visuel de la pièce (image découpée + rotation décorative) */
+.piece .skin{
+  position:absolute; inset:0;
+  /* L'image est déclarée UNE SEULE fois sur #playArea (--puzzle-img) et
+     héritée : on n'écrit JAMAIS la data-URL dans le style de chaque pièce
+     (1296 × ~100 Ko = plusieurs centaines de Mo → plantage du navigateur). */
+  background-image:var(--puzzle-img,none);
+  background-repeat:no-repeat;
+  border-radius:3px;
+  /* Contour léger : bien moins cher à peindre qu'une ombre portée */
+  outline:1px solid rgba(255,255,255,.16);
+  outline-offset:-1px;
+  box-shadow:0 2px 6px rgba(0,0,0,.45);
+  transform:rotate(var(--rot,0deg));
+  transition:transform .35s cubic-bezier(.2,.85,.25,1.04), box-shadow .2s ease, filter .2s ease;
+}
+@media (hover:hover){
+  .piece:not(.dragging):not(.is-placed):hover .skin{ filter:brightness(1.1); }
+}
+.piece.selected .skin{
+  box-shadow:0 0 0 2px var(--accent2), 0 0 20px rgba(34,211,238,.75), 0 2px 6px rgba(0,0,0,.45);
+}
+.piece.is-placed .skin{
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.piece.dragging .skin{
+  transform:rotate(var(--rot,0deg)) scale(1.07);
+  box-shadow:0 16px 32px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.32);
+}
+/* Grilles denses (≥ 100 pièces : 12×12, 36×36) : plus d'ombres par pièce.
+   1296 box-shadow repeintes à chaque scroll = lag assuré. Le contour suffit. */
+#playArea.dense .piece .skin,
+#playArea.dense .piece.is-placed .skin{ box-shadow:none; }
+
+/* Couche fixe où vivent les pièces pendant un glissement */
+#dragLayer{
+  position:fixed; inset:0; z-index:60;
+  pointer-events:none;
+}
+body.is-dragging{ cursor:grabbing; user-select:none; -webkit-user-select:none; }
+
+/* ============================================================
+   6. SURCOUCHES (victoire, aperçu d'image, toast)
+   ============================================================ */
+.overlay{
+  position:fixed; inset:0; z-index:80;
+  display:grid; place-items:center;
+  background:rgba(6,9,20,.74);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  opacity:0; visibility:hidden;
+  transition:opacity .28s ease, visibility .28s ease;
+  padding:16px;
+}
+.overlay.open{ opacity:1; visibility:visible; }
+
+.modal{
+  width:min(460px,94vw);
+  max-height:92dvh;                   /* ne dépasse jamais l'écran (paysage) */
+  overflow-y:auto;
+  background:linear-gradient(160deg, rgba(34,40,74,.96), rgba(16,20,40,.98));
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:24px;
+  padding:30px 26px 26px;
+  text-align:center;
+  box-shadow:0 34px 90px rgba(0,0,0,.65);
+  transform:translateY(20px) scale(.95);
+  transition:transform .32s cubic-bezier(.2,.9,.3,1.2);
+}
+.overlay.open .modal{ transform:translateY(0) scale(1); }
+.modal-emoji{ font-size:3.2rem; line-height:1; margin-bottom:6px; filter:drop-shadow(0 6px 18px rgba(251,191,36,.45)); }
+.modal h2{ margin:6px 0 4px; font-size:1.5rem; }
+.modal-sub{ margin:0 0 18px; color:var(--muted); font-size:.92rem; }
+.modal-stats{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  margin-bottom:20px;
+}
+.modal-stats div{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px; padding:10px 6px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.modal-stats span{ font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; }
+.modal-stats b{ font-size:1.05rem; font-variant-numeric:tabular-nums; }
+.modal-actions{ display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
+
+/* Aperçu plein écran de l'image cible */
+#imgOverlay{ cursor:zoom-out; background:rgba(6,9,20,.86); }
+#imgFull{
+  max-width:min(94vw,1100px);
+  max-height:88vh;
+  max-height:88dvh;
+  border-radius:18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  transform:scale(.96); transition:transform .3s ease;
+  object-fit:contain;
+}
+#imgOverlay.open #imgFull{ transform:scale(1); }
+
+/* Petit toast de confirmation */
+.toast{
+  position:fixed; left:50%; bottom:26px; z-index:95;
+  transform:translate(-50%,24px);
+  background:rgba(21,27,51,.96);
+  border:1px solid rgba(255,255,255,.16);
+  color:var(--text);
+  padding:11px 18px; border-radius:13px;
+  font-size:.9rem; font-weight:600;
+  box-shadow:0 14px 40px rgba(0,0,0,.5);
+  opacity:0; pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+}
+.toast.show{ opacity:1; transform:translate(-50%,0); }
+
+/* Confettis de victoire */
+#confetti{
+  position:fixed; inset:0; z-index:85;
+  pointer-events:none;
+}
+
+/* ============================================================
+   7. RESPONSIVE
+   ============================================================ */
+
+/* ---- Tablette / mobile (≤ 880 px) : réserves sous le plateau ---- */
+@media (max-width:880px){
+  #playArea{ flex-direction:column; }
+  #tray{ flex:0 0 auto; height:31vh; }
+  .toolbar{ justify-content:center; }
+}
+
+/* ---- Petit écran (≤ 640 px) : chaque barre d'outils = UNE ligne scrollable
+        (au lieu de 2-3 lignes de boutons qui bouffent la hauteur du plateau) ---- */
+@media (max-width:640px){
+  body{
+    padding:max(10px, env(safe-area-inset-top))
+            max(10px, env(safe-area-inset-right))
+            max(10px, env(safe-area-inset-bottom))
+            max(10px, env(safe-area-inset-left));
+    gap:9px;
+  }
+  .brand-txt{ display:none; }
+  .brand{ font-size:1.15rem; }
+  .chip{ font-size:.78rem; padding:6px 10px; gap:5px; }
+  .btn{ padding:8px 10px; font-size:.8rem; }
+  .toolbar{ padding:8px; row-gap:8px; }
+
+  /* Actions et niveaux défilent horizontalement, sans barre de défilement visible */
+  .toolbar-group,
+  .levels{
+    flex-wrap:nowrap;
+    width:100%; min-width:0;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;     /* le scroll n'affecte pas la page */
+    scrollbar-width:none; -ms-overflow-style:none;
+    padding-bottom:2px;
+  }
+  .toolbar-group::-webkit-scrollbar,
+  .levels::-webkit-scrollbar{ display:none; }
+
+  .modal-stats{ grid-template-columns:1fr; }
+  .modal-stats div{ flex-direction:row; justify-content:space-between; align-items:center; padding:9px 12px; }
+}
+
+/* ---- Très petits écrans (≤ 400 px) : on compacte encore ---- */
+@media (max-width:400px){
+  .chip-lbl{ display:none; }           /* « coups » : l'icône 🎯 suffit */
+  .btn{ padding:8px 9px; gap:5px; }
+  .lvl{ padding:7px 10px; font-size:.78rem; }
+}
+
+/* ---- Cible tactile : zones de clic ≥ 44 px (ergonomie doigt) ---- */
+@media (pointer:coarse){
+  .btn{ min-height:44px; }
+  .lvl{ min-height:40px; padding:9px 14px; }
+}
+
+/* ---- Écran bas (paysage mobile…) : on compacre ---- */
+@media (max-height:560px){
+  .tray-head{ padding:6px 12px; }
+  #tray{ height:27vh; }
+}
+
+/* ---- Très bas (≤ 480 px de haut) : TOUT tient sur une ligne ---- */
+@media (max-height:480px){
+  body{ gap:7px; padding-top:max(7px, env(safe-area-inset-top)); padding-bottom:max(7px, env(safe-area-inset-bottom)); }
+  .topbar{ gap:6px; }
+  .brand{ font-size:1rem; }
+  .chip{ padding:4px 8px; font-size:.72rem; }
+  .btn{ padding:7px 9px; font-size:.78rem; min-height:36px; }
+  .lvl{ padding:7px 11px; font-size:.78rem; min-height:34px; }
+
+  /* La barre d'outils entière défile horizontalement sur une seule ligne */
+  .toolbar{
+    flex-wrap:nowrap;
+    gap:8px; padding:7px;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+  }
+  .toolbar::-webkit-scrollbar{ display:none; }
+  .toolbar-group,
+  .levels{ flex:0 0 auto; width:auto; min-width:0; overflow:visible; padding-bottom:0; flex-wrap:nowrap; }
+
+  .tray-head{ padding:4px 10px; font-size:.7rem; }
+  #tray{ height:24vh; }
+  .modal{ padding:18px 16px; }
+  .modal-emoji{ font-size:2.4rem; }
+  .modal h2{ font-size:1.2rem; }
+}
+
+/* Accessibilité : réduire les animations */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    transition-duration:.01ms !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================== EN-TÊTE ===================== -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-emoji">🧩</span>
+    <span class="brand-txt">Puzzle&nbsp;</span><span class="grad">Studio</span>
+  </div>
+  <div class="stats" role="status" aria-live="polite">
+    <div class="chip" title="Temps écoulé">⏱ <b id="timeVal">00:00</b></div>
+    <div class="chip" title="Nombre de pièces aimantées">🎯 <b id="movesVal">0</b>&nbsp;<span class="chip-lbl">coups</span></div>
+    <div class="chip" title="Pièces bien placées">✅ <b id="placedVal">0</b>/<span id="totalVal">9</span></div>
+  </div>
+</header>
+
+<!-- ===================== BARRE D'OUTILS ===================== -->
+<div class="toolbar">
+  <div class="toolbar-group">
+    <button class="btn btn-primary" id="btnImport" title="Choisir une image de votre appareil">📤 Téléimporter une image</button>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+    <button class="btn" id="btnShuffle" title="Remélanger les pièces">🔀 Recommencer</button>
+    <button class="btn" id="btnNewImg" title="Générer une nouvelle image d'ambiance">🎲 Nouvelle image</button>
+    <button class="btn btn-icon" id="btnPreview" title="Voir l'image complète" aria-label="Voir l'image complète">👁️</button>
+    <button class="btn btn-icon" id="btnSound" title="Activer / couper le son" aria-label="Activer ou couper le son">🔊</button>
+  </div>
+  <div class="levels" id="levels" role="group" aria-label="Choix du niveau de difficulté">
+    <!-- Boutons de niveaux générés en JavaScript -->
+  </div>
+</div>
+
+<!-- ===================== PROGRESSION ===================== -->
+<div class="progress" aria-hidden="true"><div id="progressFill"></div></div>
+
+<!-- ===================== ZONE DE JEU ===================== -->
+<main id="playArea">
+  <div id="boardArea">
+    <div id="board">
+      <div id="slots" aria-hidden="true"></div>
+    </div>
+  </div>
+  <aside id="tray" aria-label="Pièces à placer">
+    <div class="tray-head">
+      <span>Pièces à placer</span>
+      <span class="badge" id="trayCount">9</span>
+    </div>
+    <div id="trayViewport">
+      <div id="trayContent"></div>
+    </div>
+  </aside>
+</main>
+
+<!-- Couche de glissement (pièces en cours de drag) -->
+<div id="dragLayer"></div>
+
+<!-- ===================== MODALE DE VICTOIRE ===================== -->
+<div class="overlay" id="winOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="modal-emoji">🏆</div>
+    <h2 id="winTitle">Puzzle terminé&nbsp;!</h2>
+    <p class="modal-sub" id="winSub">Bravo, vous avez reconstitué l'image.</p>
+    <div class="modal-stats">
+      <div><span>Temps</span><b id="winTime">00:00</b></div>
+      <div><span>Coups</span><b id="winMoves">0</b></div>
+      <div><span>Niveau</span><b id="winLevel">Facile 3×3</b></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="btnReplay">🔄 Rejouer</button>
+      <button class="btn" id="btnWinImport">📤 Importer une image</button>
+      <button class="btn" id="btnCloseWin">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APERÇU DE L'IMAGE ===================== -->
+<div class="overlay" id="imgOverlay" title="Clic pour fermer">
+  <img id="imgFull" alt="Aperçu de l'image du puzzle" draggable="false">
+</div>
+
+<!-- Confettis -->
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+"use strict";
+/* ============================================================================
+   PUZZLE STUDIO — moteur de jeu
+   ----------------------------------------------------------------------------
+   Concepts clés :
+   • Chaque pièce est un <div> dont la "peau" (.skin) affiche une portion de
+     l'image grâce à background-size (grid×100%) + background-position (%).
+   • Deux lieux de repos : le plateau (#board, emplacement correct) ou les
+     réserves (#trayContent, position "maison" mélangée).
+   • Pendant un glissement, la pièce est déplacée dans #dragLayer (coordonnées
+     fixes = pixels écran), ce qui rend le suivi du doigt sans dépendre du
+     scroll ni du repère du parent.
+   • Aimantation : si le centre de la pièce est assez proche de SON emplacement,
+     elle s'y clipse avec une animation élastique.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. CONSTANTES & NIVEAUX
+   --------------------------------------------------------------------------- */
+const LEVELS = [
+  { id:'facile',     grid:3,  label:'Facile'     },
+  { id:'moyen',      grid:4,  label:'Moyen'      },
+  { id:'difficile',  grid:5,  label:'Difficile'  },
+  { id:'expert',     grid:6,  label:'Expert'     },
+  { id:'maitre',     grid:12, label:'Maître'     },
+  { id:'legendaire', grid:36, label:'Légendaire' },
+];
+
+const TRAY_PAD_MIN = 14;   // marge mini dans les réserves
+const DRAG_START    = 5;   // px avant de considérer un vrai glissement
+const SNAP_SMALL    = .45; // part de la taille de pièce (grandes pièces)
+const SNAP_TINY     = .9;  // part de la taille de pièce (petites pièces, doigt)
+const SNAP_CAP      = 24;  // rayon d'aimantation max en px
+
+/* ---------------------------------------------------------------------------
+   2. RÉFÉRENCES DOM
+   --------------------------------------------------------------------------- */
+const $ = (s) => document.querySelector(s);
+
+const boardEl      = $('#board');
+const boardArea    = $('#boardArea');
+const slotsEl      = $('#slots');
+const playArea     = $('#playArea');
+const tray         = $('#tray');
+const trayViewport = $('#trayViewport');
+const trayContent  = $('#trayContent');
+const dragLayer    = $('#dragLayer');
+const levelsEl     = $('#levels');
+
+const timeVal      = $('#timeVal');
+const movesVal     = $('#movesVal');
+const placedVal    = $('#placedVal');
+const totalVal     = $('#totalVal');
+const trayCount    = $('#trayCount');
+const progressFill = $('#progressFill');
+
+const fileInput    = $('#fileInput');
+const winOverlay   = $('#winOverlay');
+const imgOverlay   = $('#imgOverlay');
+const imgFull      = $('#imgFull');
+
+/* ---------------------------------------------------------------------------
+   3. ÉTAT DU JEU
+   --------------------------------------------------------------------------- */
+const state = {
+  imgURL: null,        // data-URL de l'image courante
+  grid: 3,             // taille de la grille (3 → 3×3)
+  levelId: 'facile',
+  pieces: [],          // table indexée par l'id de la pièce (= rang de son emplacement)
+  slotEls: [],         // <div class="slot"> indexés par id
+  trayOrder: [],       // ids de pièces dans l'ordre de mélange des réserves
+  placed: new Set(),   // ids correctement aimantés
+  moves: 0,
+  elapsedMs: 0,        // temps cumulé
+  startedAt: 0,
+  running: false,
+  won: false,
+  selectedId: null,    // pièce sélectionnée par clic
+  boardSize: 0,
+  ps: 0,               // taille d'une pièce (pixel)
+  trayPad: TRAY_PAD_MIN,
+  builtGrid: null,     // grille du DOM construit (buildStructure)
+  builtURL: null,      // image du DOM construit
+};
+
+let drag = null;       // informations du glissement en cours
+let hintSlot = null;   // emplacement actuellement surligné
+let soundOn = true;
+let audioCtx = null;
+
+/* ---------------------------------------------------------------------------
+   4. UTILITAIRES
+   --------------------------------------------------------------------------- */
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+/** Mélange de Fisher-Yates (retourne un nouveau tableau) */
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** 00:00 / 12:34 à partir de millisecondes */
+function fmtTime(ms){
+  const s = Math.floor(ms / 1000);
+  return String(Math.floor(s / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
+}
+
+/** Déplace une pièce (translation seule — la rotation vit sur .skin via --rot) */
+function moveTo(el, x, y){
+  el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+}
+
+/** Petit message éphémère en bas de l'écran */
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 350);
+  }, 2400);
+}
+
+/** Temps total écoulé (y compris la session en cours) */
+function elapsed(){
+  return state.elapsedMs + (state.running ? Date.now() - state.startedAt : 0);
+}
+
+/** Démarre le chronomètre (une seule fois) */
+function startTimer(){
+  if (state.running || state.won) return;
+  state.running = true;
+  state.startedAt = Date.now();
+}
+
+/* ---------------------------------------------------------------------------
+   5. SONS (WebAudio, créé à la première interaction)
+   --------------------------------------------------------------------------- */
+function ensureAudio(){
+  if (!soundOn) return null;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  try {
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  } catch(_){ return null; }
+}
+
+/** Note simple : fréquence, délai, durée, volume, type d'onde */
+function tone(freq, delay = 0, dur = .1, vol = .12, type = 'triangle'){
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  const t0 = ctx.currentTime + delay;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.linearRampToValueAtTime(vol, t0 + .012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + .03);
+}
+const sfxPlace  = () => { tone(740, 0, .09); tone(988, .05, .11); };
+const sfxReturn = () => tone(300, 0, .09, .08, 'sine');
+const sfxTick   = () => tone(1180, 0, .05, .06, 'sine');
+const sfxWin    = () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .13, .32, .13));
+
+/* ---------------------------------------------------------------------------
+   6. IMAGES PROCÉDURALES (image par défaut + "Nouvelle image")
+   ---------------------------------------------------------------------------
+   11 ambiances générées par canvas : géométrique, coucher de soleil, vagues,
+   forêt, océan, nuit étoilée, montagnes, aurore boréale, désert, abstrait,
+   ville. Aucun fichier externe nécessaire → le jeu fonctionne hors ligne.
+   Les couleurs varient aussi au hasard à chaque génération : des dizaines de
+   rendus distincts. makeArt(kind) accepte une ambiance imposée (galerie).
+   --------------------------------------------------------------------------- */
+const ART_KINDS = ['geo','sunset','waves','forest','ocean','stars','mountains','aurora','desert','abstract','city'];
+
+const ART_LABELS = {
+  geo:'géométrique', sunset:'coucher de soleil', waves:'vagues', forest:'forêt',
+  ocean:'océan', stars:'nuit étoilée', mountains:'montagnes', aurora:'aurore boréale',
+  desert:'désert', abstract:'abstrait', city:'ville la nuit',
+};
+
+/** Ambiance au hasard en évitant la précédente (pour varier à chaque clic) */
+function randomOtherKind(){
+  const pool = ART_KINDS.filter(k => k !== state.artKind);
+  const list = pool.length ? pool : ART_KINDS;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+/**
+ * Génère une image d'ambiance sur canvas.
+ * @param {string} [pickKind] — ambiance imposée (ART_KINDS) ; sinon aléatoire
+ * @returns {string} data-URL JPEG
+ */
+function makeArt(pickKind){
+  const S = 900;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const x = cv.getContext('2d');
+  const kind = (pickKind && ART_LABELS[pickKind]) ? pickKind : randomOtherKind();
+  state.artKind = kind;
+
+  if (kind === 'sunset') {
+    /* --- Coucher de soleil --- */
+    const sky = x.createLinearGradient(0, 0, 0, S);
+    sky.addColorStop(0,   '#1b1247');
+    sky.addColorStop(.45, '#b8407c');
+    sky.addColorStop(.72, '#ff8a4c');
+    sky.addColorStop(1,   '#ffd98a');
+    x.fillStyle = sky;
+    x.fillRect(0, 0, S, S);
+
+    // Soleil + halo
+    const sx = S * .5, sy = S * .60;
+    const glow = x.createRadialGradient(sx, sy, 10, sx, sy, 220);
+    glow.addColorStop(0, 'rgba(255,255,235,.95)');
+    glow.addColorStop(.25, 'rgba(255,220,140,.75)');
+    glow.addColorStop(1, 'rgba(255,160,90,0)');
+    x.fillStyle = glow;
+    x.fillRect(0, 0, S, S);
+    x.fillStyle = '#fff7dd';
+    x.beginPath(); x.arc(sx, sy, 78, 0, Math.PI * 2); x.fill();
+
+    // Montagnes (3 couches)
+    const ridge = (baseY, amp, color, seed) => {
+      x.fillStyle = color;
+      x.beginPath();
+      x.moveTo(0, S);
+      x.lineTo(0, baseY);
+      for (let px = 0; px <= S; px += 30){
+        const n = Math.sin(px * .013 + seed) * .6 + Math.sin(px * .031 + seed * 2) * .4;
+        x.lineTo(px, baseY - n * amp);
+      }
+      x.lineTo(S, baseY);
+      x.lineTo(S, S);
+      x.closePath(); x.fill();
+    };
+    ridge(S * .66, 60, '#5b2b66', 1.3);
+    ridge(S * .74, 48, '#37194d', 4.1);
+    ridge(S * .82, 36, '#201038', 7.7);
+
+    // Mer + reflets
+    x.fillStyle = '#141f4e';
+    x.fillRect(0, S * .84, S, S * .16);
+    x.fillStyle = 'rgba(255,210,130,.55)';
+    for (let i = 0; i < 16; i++){
+      const y = S * .85 + i * 9;
+      const w = 40 + Math.random() * 220;
+      x.fillRect(sx - w / 2 + (Math.random() - .5) * 60, y, w, 3);
+    }
+
+  } else if (kind === 'waves') {
+    /* --- Vagues abstraites --- */
+    const bg = x.createLinearGradient(0, 0, S, S);
+    bg.addColorStop(0, '#0b1030');
+    bg.addColorStop(1, '#101c46');
+    x.fillStyle = bg;
+    x.fillRect(0, 0, S, S);
+    x.lineCap = 'round';
+    for (let i = 0; i < 30; i++){
+      const y0 = (i / 30) * S;
+      x.strokeStyle = 'hsla(' + (185 + i * 5) + ',85%,' + (45 + i) + '%,.55)';
+      x.lineWidth = 2 + (i % 4);
+      x.beginPath();
+      for (let px = 0; px <= S; px += 8){
+        const y = y0 + Math.sin(px * .012 + i * .7) * (34 + i * 2) + Math.sin(px * .03 + i) * 10;
+        px === 0 ? x.moveTo(px, y) : x.lineTo(px, y);
+      }
+      x.stroke();
+    }
+    // Bulles
+    for (let i = 0; i < 40; i++){
+      x.fillStyle = 'rgba(255,255,255,' + (.05 + Math.random() * .18) + ')';
+      x.beginPath();
+      x.arc(Math.random() * S, Math.random() * S, 2 + Math.random() * 9, 0, Math.PI * 2);
+      x.fill();
+    }
+
+  } else if (kind === 'forest') {
+    /* --- Forêt de sapins au lever du jour --- */
+    const sky = x.createLinearGradient(0, 0, 0, S);
+    sky.addColorStop(0, '#0b2733');
+    sky.addColorStop(.5, '#2e6e5e');
+    sky.addColorStop(.78, '#a8e0c3');
+    sky.addColorStop(1, '#e8f5d9');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S);
+
+    // Brume horizontale
+    x.fillStyle = 'rgba(255,255,255,.14)';
+    for (let i = 0; i < 6; i++) x.fillRect(0, S * (.45 + i * .07), S, 10 + Math.random() * 26);
+
+    // Halo du soleil levant
+    const mx = S * (.25 + Math.random() * .5), my = S * .3;
+    const glow = x.createRadialGradient(mx, my, 8, mx, my, 175);
+    glow.addColorStop(0, 'rgba(255,250,220,.95)');
+    glow.addColorStop(1, 'rgba(255,250,220,0)');
+    x.fillStyle = glow; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#fffbe4';
+    x.beginPath(); x.arc(mx, my, 52, 0, Math.PI * 2); x.fill();
+
+    // 3 couches de sapins (silhouettes de plus en plus foncées)
+    const layers = ['#16453a', '#0e3229', '#08231d'];
+    for (let l = 0; l < 3; l++){
+      const baseY = S * (.62 + l * .13);
+      x.fillStyle = layers[l];
+      for (let px = -30; px < S + 30; px += 46 + Math.random() * 36){
+        const h = (70 + l * 40) + Math.random() * (90 + l * 50);
+        const w = h * (.42 + Math.random() * .2);
+        x.beginPath();
+        x.moveTo(px - w / 2, baseY + 20);
+        x.lineTo(px, baseY - h);
+        x.lineTo(px + w / 2, baseY + 20);
+        x.closePath(); x.fill();
+      }
+    }
+    // Sol
+    x.fillStyle = '#061713';
+    x.fillRect(0, S * .88, S, S * .12);
+
+  } else if (kind === 'ocean') {
+    /* --- Océan turquoise sous un soleil bas --- */
+    const sky = x.createLinearGradient(0, 0, 0, S * .55);
+    sky.addColorStop(0, '#ffd9a0');
+    sky.addColorStop(1, '#8ed6e8');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S * .55);
+
+    const sx = S * (.35 + Math.random() * .3), sy = S * .42;
+    const g2 = x.createRadialGradient(sx, sy, 6, sx, sy, 200);
+    g2.addColorStop(0, 'rgba(255,246,214,1)');
+    g2.addColorStop(.3, 'rgba(255,214,130,.8)');
+    g2.addColorStop(1, 'rgba(255,214,130,0)');
+    x.fillStyle = g2; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#fff7d6';
+    x.beginPath(); x.arc(sx, sy, 60, 0, Math.PI * 2); x.fill();
+
+    // Mer dégradée
+    const sea = x.createLinearGradient(0, S * .55, 0, S);
+    sea.addColorStop(0, '#2a9db8');
+    sea.addColorStop(.5, '#17708f');
+    sea.addColorStop(1, '#0b3d57');
+    x.fillStyle = sea; x.fillRect(0, S * .55, S, S * .45);
+
+    // Vagues : traits blancs ondulés, plus marqués vers l'avant
+    for (let i = 0; i < 26; i++){
+      const y = S * .57 + i * (S * .43 / 26);
+      x.strokeStyle = 'rgba(255,255,255,' + (.10 + (i / 26) * .35) + ')';
+      x.lineWidth = 1.5 + i * .1;
+      x.beginPath();
+      for (let px = 0; px <= S; px += 10){
+        const yy = y + Math.sin(px * .02 + i * 1.7) * (3 + i * .25);
+        px === 0 ? x.moveTo(px, yy) : x.lineTo(px, yy);
+      }
+      x.stroke();
+    }
+    // Reflet du soleil sur l'eau
+    x.fillStyle = 'rgba(255,230,160,.5)';
+    for (let i = 0; i < 10; i++){
+      const w2 = 26 + Math.random() * 140;
+      x.fillRect(sx - w2 / 2 + (Math.random() - .5) * 50, S * .58 + i * 26, w2, 5);
+    }
+
+  } else if (kind === 'stars') {
+    /* --- Nuit étoilée avec voie lactée --- */
+    const sky = x.createLinearGradient(0, 0, 0, S);
+    sky.addColorStop(0, '#050514');
+    sky.addColorStop(.55, '#141442');
+    sky.addColorStop(1, '#2a1a55');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S);
+
+    // Voie lactée en diagonale
+    for (let i = 0; i < 320; i++){
+      const t = Math.random();
+      const bx = t * S + (Math.random() - .5) * 170;
+      const by = t * S * .8 + (Math.random() - .5) * 170;
+      x.fillStyle = 'rgba(220,225,255,' + (.03 + Math.random() * .10) + ')';
+      x.beginPath(); x.arc(bx, by, 1 + Math.random() * 2.4, 0, Math.PI * 2); x.fill();
+    }
+    // Étoiles (avec éclat cruciforme pour les plus grosses)
+    for (let i = 0; i < 210; i++){
+      const a = .35 + Math.random() * .65;
+      const r = .7 + Math.random() * 2.1;
+      const ex = Math.random() * S, ey = Math.random() * S;
+      x.fillStyle = 'rgba(255,255,255,' + a + ')';
+      x.beginPath(); x.arc(ex, ey, r, 0, Math.PI * 2); x.fill();
+      if (r > 2.3){
+        x.strokeStyle = 'rgba(255,255,255,' + (a * .7) + ')';
+        x.lineWidth = 1;
+        x.beginPath();
+        x.moveTo(ex - r * 3, ey); x.lineTo(ex + r * 3, ey);
+        x.moveTo(ex, ey - r * 3); x.lineTo(ex, ey + r * 3);
+        x.stroke();
+      }
+    }
+    // Lune pleine : halo + disque + cratères
+    const lx = S * .74, ly = S * .24, lr = 72;
+    const halo = x.createRadialGradient(lx, ly, lr * .5, lx, ly, lr * 2.6);
+    halo.addColorStop(0, 'rgba(246,242,217,.35)');
+    halo.addColorStop(1, 'rgba(246,242,217,0)');
+    x.fillStyle = halo; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#f6f2d9';
+    x.beginPath(); x.arc(lx, ly, lr, 0, Math.PI * 2); x.fill();
+    x.fillStyle = 'rgba(200,195,165,.5)';
+    [[-.3, -.25, .22], [.25, .1, .16], [.05, .35, .12]].forEach(c => {
+      x.beginPath(); x.arc(lx + c[0] * lr, ly + c[1] * lr, c[2] * lr, 0, Math.PI * 2); x.fill();
+    });
+
+  } else if (kind === 'mountains') {
+    /* --- Montagnes enneigées --- */
+    const sky = x.createLinearGradient(0, 0, 0, S * .7);
+    sky.addColorStop(0, '#7fb2e5');
+    sky.addColorStop(.6, '#cfe3f7');
+    sky.addColorStop(1, '#f3e9f5');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#fff8e0';
+    x.beginPath(); x.arc(S * .68, S * .2, 56, 0, Math.PI * 2); x.fill();
+
+    // 3 rangées de sommets (lointain → proche) avec casques de neige
+    const rows = [
+      { y:.55, h:.30, col:'#8d9cc4' },
+      { y:.70, h:.34, col:'#5b6a96' },
+      { y:.86, h:.30, col:'#39446b' },
+    ];
+    rows.forEach(rw => {
+      const peaks = [];
+      let px0 = -60;
+      while (px0 < S + 60){
+        const pw = 140 + Math.random() * 190;
+        const ph = S * rw.h * (.5 + Math.random() * .8);
+        peaks.push({ x:px0 + pw / 2, y:S * rw.y - ph, w:pw });
+        px0 += pw * (.8 + Math.random() * .35);
+      }
+      // Silhouette
+      x.fillStyle = rw.col;
+      x.beginPath();
+      x.moveTo(-60, S);
+      x.lineTo(-60, S * rw.y + 30);
+      peaks.forEach((pk, i) => {
+        x.lineTo(pk.x, pk.y);
+        const nx = peaks[i + 1] ? (pk.x + peaks[i + 1].x) / 2 : pk.x + pk.w * .6;
+        x.lineTo(nx, S * rw.y + 30);
+      });
+      x.lineTo(S + 60, S);
+      x.closePath(); x.fill();
+      // Neige au sommet
+      peaks.forEach(pk => {
+        const cw = pk.w * .34;
+        const ch = Math.max(30, (S * rw.y + 30 - pk.y) * .28);
+        x.fillStyle = 'rgba(255,255,255,.92)';
+        x.beginPath();
+        x.moveTo(pk.x, pk.y);
+        x.lineTo(pk.x + cw / 2, pk.y + ch);
+        x.lineTo(pk.x - cw / 2, pk.y + ch);
+        x.closePath(); x.fill();
+      });
+    });
+
+  } else if (kind === 'aurora') {
+    /* --- Aurore boréale sur une crête --- */
+    const sky = x.createLinearGradient(0, 0, 0, S);
+    sky.addColorStop(0, '#020410');
+    sky.addColorStop(.6, '#071433');
+    sky.addColorStop(1, '#0b1e42');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S);
+
+    for (let i = 0; i < 160; i++){
+      x.fillStyle = 'rgba(255,255,255,' + (.2 + Math.random() * .7) + ')';
+      x.beginPath(); x.arc(Math.random() * S, Math.random() * S * .85, .6 + Math.random() * 1.7, 0, Math.PI * 2); x.fill();
+    }
+
+    // Rubans lumineux (composite « screen » pour l'effet de lumière)
+    x.globalCompositeOperation = 'screen';
+    const hues = [140 + Math.random() * 40, 170 + Math.random() * 40, 275 + Math.random() * 45];
+    hues.forEach((h, i) => {
+      x.strokeStyle = 'hsla(' + h + ',90%,60%,' + (.3 + Math.random() * .2) + ')';
+      x.lineWidth = 60 + i * 34;
+      x.lineCap = 'round';
+      x.beginPath();
+      const base = S * (.16 + i * .14);
+      for (let px = -40; px <= S + 40; px += 24){
+        const y = base + Math.sin(px * .008 + i * 2) * 80 + Math.sin(px * .02 + i) * 30;
+        px === -40 ? x.moveTo(px, y) : x.lineTo(px, y);
+      }
+      x.stroke();
+    });
+    x.globalCompositeOperation = 'source-over';
+
+    // Crête de collines noires en contrebas
+    x.fillStyle = '#04070f';
+    x.beginPath();
+    x.moveTo(0, S); x.lineTo(0, S * .86);
+    for (let px = 0; px <= S; px += 40){
+      x.lineTo(px, S * .86 + Math.sin(px * .011) * 26 + Math.random() * 8);
+    }
+    x.lineTo(S, S); x.closePath(); x.fill();
+
+  } else if (kind === 'desert') {
+    /* --- Dunes au coucher du soleil --- */
+    const sky = x.createLinearGradient(0, 0, 0, S * .7);
+    sky.addColorStop(0, '#3b1e5e');
+    sky.addColorStop(.55, '#c65d4a');
+    sky.addColorStop(1, '#ffb36b');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S);
+
+    const sx = S * .5, sy = S * .55;
+    const glow = x.createRadialGradient(sx, sy, 10, sx, sy, 260);
+    glow.addColorStop(0, 'rgba(255,240,190,.95)');
+    glow.addColorStop(.35, 'rgba(255,190,110,.55)');
+    glow.addColorStop(1, 'rgba(255,190,110,0)');
+    x.fillStyle = glow; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#ffe9b8';
+    x.beginPath(); x.arc(sx, sy, 84, 0, Math.PI * 2); x.fill();
+
+    // 4 couches de dunes
+    const dunes = [
+      { y:.66, col:'#e09a55' }, { y:.76, col:'#b46a3c' },
+      { y:.86, col:'#8a4a2e' }, { y:.94, col:'#5e3122' },
+    ];
+    dunes.forEach((d, i) => {
+      x.fillStyle = d.col;
+      x.beginPath();
+      x.moveTo(0, S);
+      x.lineTo(0, S * d.y + 30);
+      x.quadraticCurveTo(S * (.25 + i * .12), S * d.y - (60 - i * 8) - Math.random() * 50,
+                         S * .55, S * d.y + 20);
+      x.quadraticCurveTo(S * .8, S * d.y + 70, S, S * d.y - 20);
+      x.lineTo(S, S);
+      x.closePath(); x.fill();
+    });
+
+  } else if (kind === 'abstract') {
+    /* --- Abstraction : taches de couleur façon mesh --- */
+    const h0 = Math.floor(Math.random() * 360);
+    const base = x.createLinearGradient(0, 0, S, S);
+    base.addColorStop(0, 'hsl(' + h0 + ',60%,88%)');
+    base.addColorStop(1, 'hsl(' + ((h0 + 80) % 360) + ',55%,80%)');
+    x.fillStyle = base; x.fillRect(0, 0, S, S);
+
+    for (let i = 0; i < 9; i++){
+      const hh = (h0 + Math.random() * 240) % 360;
+      const cx2 = Math.random() * S, cy2 = Math.random() * S;
+      const rr = 120 + Math.random() * 300;
+      const blob = x.createRadialGradient(cx2, cy2, 0, cx2, cy2, rr);
+      blob.addColorStop(0, 'hsla(' + hh + ',' + (70 + Math.random() * 25) + '%,' +
+                            (45 + Math.random() * 25) + '%,.75)');
+      blob.addColorStop(1, 'hsla(' + hh + ',80%,60%,0)');
+      x.fillStyle = blob;
+      x.fillRect(0, 0, S, S);
+    }
+    // Cerneaux fins
+    x.strokeStyle = 'rgba(255,255,255,.5)';
+    x.lineWidth = 3;
+    for (let i = 0; i < 5; i++){
+      x.beginPath();
+      x.arc(Math.random() * S, Math.random() * S, 80 + Math.random() * 300, 0, Math.PI * 2);
+      x.stroke();
+    }
+
+  } else if (kind === 'city') {
+    /* --- Skyline nocturne, fenêtres allumées --- */
+    const sky = x.createLinearGradient(0, 0, 0, S);
+    sky.addColorStop(0, '#070b1d');
+    sky.addColorStop(.6, '#182046');
+    sky.addColorStop(1, '#33265c');
+    x.fillStyle = sky; x.fillRect(0, 0, S, S);
+
+    for (let i = 0; i < 110; i++){
+      x.fillStyle = 'rgba(255,255,255,' + (.15 + Math.random() * .6) + ')';
+      x.beginPath(); x.arc(Math.random() * S, Math.random() * S * .5, .5 + Math.random() * 1.5, 0, Math.PI * 2); x.fill();
+    }
+    x.fillStyle = '#f4efcf';
+    x.beginPath(); x.arc(S * .18, S * .18, 44, 0, Math.PI * 2); x.fill();
+
+    // Immeubles + fenêtres
+    const groundY = S * .9;
+    let bx2 = -20;
+    while (bx2 < S + 20){
+      const bw = 46 + Math.random() * 90;
+      const bh = S * (.22 + Math.random() * .45);
+      const top = groundY - bh;
+      x.fillStyle = 'rgb(' + (10 + (Math.random() * 22 | 0)) + ',' +
+                             (14 + (Math.random() * 24 | 0)) + ',' +
+                             (34 + (Math.random() * 40 | 0)) + ')';
+      x.fillRect(bx2, top, bw, groundY - top + 40);
+      for (let wy = top + 10; wy < groundY - 14; wy += 18){
+        for (let wx = bx2 + 7; wx < bx2 + bw - 9; wx += 15){
+          if (Math.random() < .42){
+            x.fillStyle = Math.random() < .8 ? 'rgba(255,214,120,.9)' : 'rgba(150,220,255,.85)';
+            x.fillRect(wx, wy, 7, 9);
+          }
+        }
+      }
+      bx2 += bw + 4 + Math.random() * 14;
+    }
+    // Sol + reflets au sol
+    x.fillStyle = '#05060f';
+    x.fillRect(0, groundY, S, S - groundY);
+    x.fillStyle = 'rgba(255,214,120,.10)';
+    for (let i = 0; i < 18; i++){
+      x.fillRect(Math.random() * S, groundY + 6 + Math.random() * 40, 8 + Math.random() * 46, 3);
+    }
+
+  } else {
+    /* --- Géométrique coloré (défaut) --- */
+    const h = Math.floor(Math.random() * 360);
+    const g = x.createLinearGradient(0, 0, S, S);
+    g.addColorStop(0,   'hsl(' + h + ',72%,58%)');
+    g.addColorStop(.5,  'hsl(' + ((h + 55) % 360) + ',75%,46%)');
+    g.addColorStop(1,   'hsl(' + ((h + 130) % 360) + ',70%,30%)');
+    x.fillStyle = g;
+    x.fillRect(0, 0, S, S);
+
+    x.globalCompositeOperation = 'screen';
+    for (let i = 0; i < 52; i++){
+      const hh = (h + Math.random() * 160) % 360;
+      x.fillStyle = 'hsla(' + hh + ',' + (60 + Math.random() * 30) + '%,60%,' + (.2 + Math.random() * .45) + ')';
+      if (Math.random() < .5){
+        x.beginPath();
+        x.arc(Math.random() * S, Math.random() * S, 30 + Math.random() * 160, 0, Math.PI * 2);
+        x.fill();
+      } else {
+        x.save();
+        x.translate(Math.random() * S, Math.random() * S);
+        x.rotate(Math.random() * Math.PI);
+        const w = 60 + Math.random() * 240;
+        x.fillRect(-w / 2, -w / 2, w, w * (.3 + Math.random() * .7));
+        x.restore();
+      }
+    }
+    x.globalCompositeOperation = 'source-over';
+
+    // Filets lumineux
+    x.strokeStyle = 'rgba(255,255,255,.35)';
+    x.lineWidth = 3;
+    for (let i = 0; i < 7; i++){
+      x.beginPath();
+      x.arc(Math.random() * S, Math.random() * S, 60 + Math.random() * 260, 0, Math.PI * 2);
+      x.stroke();
+    }
+  }
+
+  return cv.toDataURL('image/jpeg', .92);
+}
+
+/* ---------------------------------------------------------------------------
+   7. IMPORT D'IMAGE DEPUIS L'APPAREIL
+   --------------------------------------------------------------------------- */
+function readImageFile(file){
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')){
+      reject(new Error('format'));
+      return;
+    }
+    const fr = new FileReader();
+    fr.onerror = () => reject(new Error('lecture'));
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('décodage'));
+      img.onload = () => {
+        // Réduction adaptée au niveau : 1024 px pour les grosses grilles
+        // (12×12 et plus), 1600 px sinon → mémoire / peinture maîtrisées.
+        const MAX = state.grid >= 12 ? 1024 : 1600;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, MAX / Math.max(w, h));
+        w = Math.max(1, Math.round(w * scale));
+        h = Math.max(1, Math.round(h * scale));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = '#ffffff';          // fond blanc si PNG transparent
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(cv.toDataURL('image/jpeg', .92));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------------------------------------------------------------------------
+   8. TAILLES & MISE EN PAGE
+   --------------------------------------------------------------------------- */
+/** Choisit une taille de plateau divisible par la grille (pièces "rondes") */
+function pickBoardSize(avail, grid){
+  if (!(avail > 20)) return { size: grid * 12, ps: 12 };
+  let bs = Math.floor(avail / grid) * grid;          // divisible par grid
+  if (bs < grid * 6) bs = Math.max(grid, Math.floor(avail));
+  bs = Math.min(bs, 800);
+  bs = Math.floor(bs / grid) * grid;
+  if (bs < grid) bs = Math.max(1, Math.floor(avail));
+  return { size: bs, ps: bs / grid };
+}
+
+/** Nombre de colonnes dans les réserves selon la largeur disponible */
+function trayCols(){
+  const vw = trayViewport.clientWidth;
+  state.trayPad = Math.max(TRAY_PAD_MIN, state.ps * .14);
+  return Math.max(1, Math.floor((vw - state.trayPad * 2) / state.ps));
+}
+
+/** Recalcule les dimensions (plateau + réserves) */
+function computeSizes(){
+  const grid = state.grid;
+  const rowLayout = window.innerWidth > 880;   // réserves à droite ?
+
+  /* Largeur des réserves : calculée à partir de #playArea, dont la taille
+     ne dépend PAS des réserves → AUCUNE boucle de rétroaction avec le
+     ResizeObserver (l'ancien calcul partait de #boardArea, qui dépend de
+     cette même largeur : cela déclenchait des reconstructions en cascade). */
+  if (rowLayout){
+    const pa = playArea.getBoundingClientRect();
+    const est = pickBoardSize(Math.min(pa.width * .68, pa.height) - 10, grid);
+    const pad = Math.max(TRAY_PAD_MIN, est.ps * .14);
+    const wantCols = grid <= 4 ? Math.min(grid, 3) : (grid <= 9 ? 3 : 4);
+    const maxBasis = clamp(pa.width * .45, 240, 560);
+    const want = clamp(wantCols * est.ps + pad * 2 + 46, 260, maxBasis);
+    const cur = parseFloat(getComputedStyle(tray).getPropertyValue('--tray-basis')) || 340;
+    if (Math.abs(cur - want) >= 10) tray.style.setProperty('--tray-basis', Math.round(want) + 'px');
+  } else {
+    tray.style.removeProperty('--tray-basis');
+  }
+
+  const area = boardArea.getBoundingClientRect();
+  const pick = pickBoardSize(Math.min(area.width, area.height) - 10, grid);
+  state.boardSize = pick.size;
+  state.ps = pick.ps;
+  boardEl.style.width  = pick.size + 'px';
+  boardEl.style.height = pick.size + 'px';
+}
+
+/* ---------------------------------------------------------------------------
+   9. RENDU COMPLET (plateau + réserves)
+   ---------------------------------------------------------------------------
+   fresh = true  → nouvelle partie (nouveau mélange, compteurs à zéro)
+   fresh = false → simple repositionnement (redimensionnement de fenêtre)
+   --------------------------------------------------------------------------- */
+function render(fresh = false){
+  cancelDrag();
+
+  if (fresh){
+    const total = state.grid * state.grid;
+    // Retire l'éventuelle sélection / indice de la partie précédente
+    if (state.selectedId != null && state.pieces[state.selectedId]){
+      state.pieces[state.selectedId].el.classList.remove('selected');
+    }
+    setHint(null);
+    state.trayOrder  = shuffle(Array.from({ length: total }, (_, i) => i));
+    state.placed     = new Set();
+    state.moves      = 0;
+    state.elapsedMs  = 0;
+    state.running    = false;
+    state.startedAt  = 0;
+    state.won        = false;
+    state.selectedId = null;
+    hideOverlay(winOverlay);
+  }
+
+  computeSizes();
+
+  /* Reconstruction des DOM UNIQUEMENT si la structure a changé
+     (nouvelle grille ou nouvelle image). Un simple redimensionnement
+     se contente de repositionner les éléments existants : ~4000 nœuds
+     recréés à chaque resize = gel multi-secondes (ancien comportement). */
+  if (state.builtGrid !== state.grid || state.builtURL !== state.imgURL){
+    buildStructure();
+  }
+  layoutAll();
+}
+
+/**
+ * Crée une fois pour toutes les emplacements et les pièces de la grille
+ * courante. Coût unique (grille / image), pas de duplication de l'image.
+ */
+function buildStructure(){
+  const { grid } = state;
+  const total = grid * grid;
+  state.builtGrid = grid;
+  state.builtURL  = state.imgURL;
+
+  // L'image cible : une SEULE déclaration CSS partagée par toutes les pièces
+  playArea.style.setProperty('--puzzle-img', 'url("' + state.imgURL + '")');
+
+  /* --- Emplacements vides --- */
+  slotsEl.style.gridTemplateColumns = 'repeat(' + grid + ',1fr)';
+  const sfrag = document.createDocumentFragment();
+  for (let i = 0; i < total; i++){
+    const s = document.createElement('div');
+    s.className = 'slot';
+    s.dataset.id = i;
+    sfrag.appendChild(s);
+  }
+  slotsEl.replaceChildren(sfrag);
+  state.slotEls = Array.from(slotsEl.children);
+  hintSlot = null;
+
+  /* --- Pièces --- */
+  boardEl.querySelectorAll('.piece').forEach(el => el.remove());
+  const pfrag = document.createDocumentFragment();
+  state.pieces = new Array(total);
+
+  // Le jitter (décalage + rotation) n'existe que sur les petites grilles.
+  // Il est stocké en fraction pour survivre aux redimensionnements.
+  const jitter = grid <= 6;
+
+  for (let pid = 0; pid < total; pid++){
+    const c = pid % grid;
+    const r = Math.floor(pid / grid);
+
+    const el = document.createElement('div');
+    el.className = 'piece';
+    el.dataset.id = pid;
+
+    const skin = document.createElement('div');
+    skin.className = 'skin';
+    // Pas d'inline background-image : var(--puzzle-img) héritée (voir CSS)
+    skin.style.backgroundSize     = (grid * 100) + '% ' + (grid * 100) + '%';
+    skin.style.backgroundPosition = (grid > 1 ? (c / (grid - 1)) * 100 : 0) + '% ' +
+                                    (grid > 1 ? (r / (grid - 1)) * 100 : 0) + '%';
+    el.appendChild(skin);
+
+    state.pieces[pid] = {
+      id: pid, c, r, el, skin,
+      jx: jitter ? (Math.random() - .5) * .2 : 0,
+      jy: jitter ? (Math.random() - .5) * .2 : 0,
+      jr: jitter ? (Math.random() - .5) * 14 : 0,
+      homeX: 0, homeY: 0, homeRot: 0,
+      placed: false,
+    };
+    pfrag.appendChild(el);
+  }
+  trayContent.replaceChildren(pfrag);
+}
+
+/**
+ * Repositionne / redimensionne les éléments existants (léger).
+ * Appelé à chaque rendu, y compris après un redimensionnement de fenêtre.
+ */
+function layoutAll(){
+  const { grid, ps } = state;
+  const total = grid * grid;
+
+  // Zones denses : plus d'ombre par pièce (gain de peinture majeur)
+  playArea.classList.toggle('dense', grid >= 10);
+
+  const cols = trayCols();
+  const rows = Math.ceil(total / cols);
+  const pad  = state.trayPad;
+  trayContent.style.height = (rows * ps + pad * 2) + 'px';
+
+  // Positions « maison » dans les réserves (toutes pièces, trous compris
+  // : une pièce placée laisse un emplacement vide plutôt que de décaler les autres)
+  state.trayOrder.forEach((pid, idx) => {
+    const p = state.pieces[pid];
+    p.homeX = pad + (idx % cols) * ps + p.jx * ps;
+    p.homeY = pad + Math.floor(idx / cols) * ps + p.jy * ps;
+    p.homeRot = p.jr;
+  });
+
+  for (let pid = 0; pid < total; pid++){
+    const p = state.pieces[pid];
+    p.placed = state.placed.has(pid);
+    p.el.style.width  = ps + 'px';
+    p.el.style.height = ps + 'px';
+
+    // Change de parent uniquement si nécessaire (plateau ↔ réserves)
+    const parent = p.placed ? boardEl : trayContent;
+    if (p.el.parentElement !== parent) parent.appendChild(p.el);
+
+    if (p.placed){
+      moveTo(p.el, p.c * ps, p.r * ps);
+      p.skin.style.setProperty('--rot', '0deg');
+      p.el.classList.add('is-placed');
+    } else {
+      moveTo(p.el, p.homeX, p.homeY);
+      p.skin.style.setProperty('--rot', p.homeRot + 'deg');
+      p.el.classList.remove('is-placed');
+    }
+  }
+
+  // Restaure l'éventuelle sélection après un re-rendu
+  if (state.selectedId != null){
+    const p = state.pieces[state.selectedId];
+    if (p && !p.placed){
+      p.el.classList.add('selected');
+      setHint(p);
+    } else {
+      state.selectedId = null;
+      setHint(null);
+    }
+  } else {
+    setHint(null);
+  }
+
+  updateHUD();
+}
+
+/* ---------------------------------------------------------------------------
+   10. INTERFACE : compteurs, niveaux, progression
+   --------------------------------------------------------------------------- */
+function updateHUD(){
+  const total = state.grid * state.grid;
+  const done  = state.placed.size;
+  timeVal.textContent   = fmtTime(elapsed());
+  movesVal.textContent  = state.moves;
+  placedVal.textContent = done;
+  totalVal.textContent  = total;
+  trayCount.textContent = total - done;
+  progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
+}
+
+function buildLevelButtons(){
+  levelsEl.innerHTML = '';
+  LEVELS.forEach(lv => {
+    const b = document.createElement('button');
+    b.className = 'lvl';
+    b.type = 'button';
+    b.dataset.id = lv.id;
+    b.textContent = lv.label + ' ' + lv.grid + '×' + lv.grid;
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => setLevel(lv.id));
+    levelsEl.appendChild(b);
+  });
+}
+
+function syncLevelButtons(){
+  levelsEl.querySelectorAll('.lvl').forEach(b => {
+    const on = b.dataset.id === state.levelId;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function setLevel(id){
+  const lv = LEVELS.find(l => l.id === id);
+  if (!lv) return;
+  const changed = lv.id !== state.levelId;
+  state.levelId = lv.id;
+  state.grid = lv.grid;
+  syncLevelButtons();
+  if (changed) toast('Niveau ' + lv.label + ' · ' + lv.grid + '×' + lv.grid);
+  newGame();
+}
+
+function currentLevelLabel(){
+  const lv = LEVELS.find(l => l.id === state.levelId) || LEVELS[0];
+  return lv.label + ' ' + lv.grid + '×' + lv.grid;
+}
+
+/* ---------------------------------------------------------------------------
+   11. SÉLECTION / INDICE D'EMPLACEMENT
+   --------------------------------------------------------------------------- */
+function setHint(piece){
+  if (hintSlot) hintSlot.classList.remove('hint');
+  hintSlot = piece ? state.slotEls[piece.id] : null;
+  if (hintSlot) hintSlot.classList.add('hint');
+}
+
+function select(piece){
+  deselect();
+  if (!piece || piece.placed) return;
+  state.selectedId = piece.id;
+  piece.el.classList.add('selected');
+  setHint(piece);
+  sfxTick();
+}
+
+function deselect(){
+  if (state.selectedId != null){
+    const p = state.pieces[state.selectedId];
+    if (p) p.el.classList.remove('selected');
+  }
+  state.selectedId = null;
+  setHint(null);
+}
+
+/* ---------------------------------------------------------------------------
+   12. PLACEMENT (aimantation) & RETOUR AUX RÉSERVES
+   --------------------------------------------------------------------------- */
+/** Rayon d'aimantation : plus généreux pour les toutes petites pièces (doigt) */
+function snapRadius(){
+  return Math.max(state.ps * SNAP_SMALL, Math.min(SNAP_CAP, state.ps * SNAP_TINY));
+}
+
+/** Anime la pièce vers SON emplacement et la verrouille dessus */
+function doPlace(piece, countMove = true){
+  if (state.won || !piece || piece.placed) return;
+
+  if (countMove) state.moves++;
+  state.placed.add(piece.id);
+  piece.placed = true;
+  deselect();
+  startTimer();
+
+  const el = piece.el;
+  const br = boardEl.getBoundingClientRect();
+  const cur = el.getBoundingClientRect();
+
+  // 1) on reparent sans transition, en conservant la position visuelle courante
+  el.style.transition = 'none';
+  boardEl.appendChild(el);
+  moveTo(el, cur.left - br.left, cur.top - br.top);
+  void el.offsetWidth;                    // force le reflow
+  // 2) puis on anime vers l'emplacement final
+  el.style.transition = '';
+  el.classList.add('animating', 'is-placed');
+  moveTo(el, piece.c * state.ps, piece.r * state.ps);
+  piece.skin.style.setProperty('--rot', '0deg');
+
+  setHint(null);
+  updateHUD();
+  sfxPlace();
+  checkWin();
+
+  // Nettoyage de la classe d'animation (transitionend + filet de sécurité
+  // au cas où l'événement ne se déclencherait pas : onglet en arrière-plan…)
+  settleAnimation(el);
+}
+
+/** Renvoie la pièce à sa place de départ dans les réserves */
+function doReturn(piece){
+  if (!piece) return;
+  const el = piece.el;
+  const tr = trayContent.getBoundingClientRect();
+  const cur = el.getBoundingClientRect();
+
+  el.style.transition = 'none';
+  trayContent.appendChild(el);
+  moveTo(el, cur.left - tr.left, cur.top - tr.top);
+  void el.offsetWidth;
+  el.style.transition = '';
+  el.classList.add('animating');
+  el.classList.remove('is-placed');
+  moveTo(el, piece.homeX, piece.homeY);
+  piece.skin.style.setProperty('--rot', piece.homeRot + 'deg');
+  sfxReturn();
+
+  settleAnimation(el);
+}
+
+/**
+ * Retire la classe « animating » une fois l'animation terminée :
+ * transitionend si possible, sinon un minuteur de sécurité (600 ms).
+ */
+function settleAnimation(el){
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    el.classList.remove('animating');
+    el.removeEventListener('transitionend', onTE);
+  };
+  const onTE = (e) => { if (e.target === el) finish(); };
+  el.addEventListener('transitionend', onTE);
+  setTimeout(finish, 600);
+}
+
+/* ---------------------------------------------------------------------------
+   13. GLISSEMENT & CLIC (pointer events — souris, tactile, stylet)
+   --------------------------------------------------------------------------- */
+function slotRectOf(piece){
+  return state.slotEls[piece.id].getBoundingClientRect();
+}
+
+function beginDrag(e, el){
+  const piece = state.pieces[+el.dataset.id];
+  if (!piece || state.won) return;
+  e.preventDefault();
+  ensureAudio();
+  startTimer();
+
+  const rect = el.getBoundingClientRect();
+  drag = {
+    piece, el,
+    startX: e.clientX, startY: e.clientY,
+    offX: e.clientX - rect.left,
+    offY: e.clientY - rect.top,
+    active: false,
+    hint: false,
+    rot: piece.placed ? 0 : piece.homeRot,
+    snapR: snapRadius(),
+    slotRect: slotRectOf(piece),
+  };
+  if (el.setPointerCapture){
+    try { el.setPointerCapture(e.pointerId); } catch(_){ /* ignore */ }
+  }
+  window.addEventListener('pointermove', onDragMove, { passive:false });
+  window.addEventListener('pointerup',    onDragUp);
+  window.addEventListener('pointercancel', onDragUp);
+}
+
+function cleanupDragListeners(){
+  window.removeEventListener('pointermove', onDragMove);
+  window.removeEventListener('pointerup',    onDragUp);
+  window.removeEventListener('pointercancel', onDragUp);
+  document.body.classList.remove('is-dragging');
+}
+
+function onDragMove(e){
+  if (!drag) return;
+  const dx = e.clientX - drag.startX;
+  const dy = e.clientY - drag.startY;
+
+  if (!drag.active){
+    if (Math.hypot(dx, dy) < DRAG_START) return;   // ce n'est qu'un écart de doigt
+
+    /* --- Début réel du glissement --- */
+    drag.active = true;
+    const p = drag.piece;
+    if (p.placed){                                  // on décroche une pièce déjà posée
+      p.placed = false;
+      state.placed.delete(p.id);
+      p.el.classList.remove('is-placed');
+      updateHUD();
+    }
+    deselect();
+    const cur = p.el.getBoundingClientRect();
+    dragLayer.appendChild(p.el);
+    p.el.style.transition = 'none';                 // pas de transition pendant le suivi
+    moveTo(p.el, cur.left, cur.top);
+    p.el.classList.add('dragging');
+    document.body.classList.add('is-dragging');
+    drag.slotRect = slotRectOf(p);                  // recal (scroll / resize)
+  }
+
+  e.preventDefault();
+  const x = e.clientX - drag.offX;
+  const y = e.clientY - drag.offY;
+  moveTo(drag.el, x, y);
+
+  /* Surlignage de l'emplacement quand on approche */
+  const sr = drag.slotRect;
+  const d = Math.hypot(x + state.ps / 2 - (sr.left + sr.width / 2),
+                       y + state.ps / 2 - (sr.top  + sr.height / 2));
+  const near = d <= drag.snapR * 1.5;
+  if (near !== drag.hint){
+    drag.hint = near;
+    setHint(near ? drag.piece : null);
+  }
+}
+
+function onDragUp(){
+  cleanupDragListeners();
+  if (!drag) return;
+  const d = drag;
+  drag = null;
+  d.el.classList.remove('dragging');
+  setHint(null);
+
+  /* --- Simple clic (aucun déplacement) --- */
+  if (!d.active){
+    const p = d.piece;
+    if (p.placed){
+      deselect();
+    } else if (state.selectedId === p.id){
+      doPlace(p);                       // 2ᵉ clic sur la pièce → pose directe
+    } else {
+      select(p);                        // 1ʳᵉ clic → surligne son emplacement
+    }
+    return;
+  }
+
+  /* --- Dépôt : aimantation ou retour aux réserves --- */
+  const p = d.piece;
+  const r = d.el.getBoundingClientRect();
+  const sr = d.slotRect;
+  const dist = Math.hypot(r.left + state.ps / 2 - (sr.left + sr.width / 2),
+                          r.top  + state.ps / 2 - (sr.top  + sr.height / 2));
+  if (dist <= d.snapR) doPlace(p);
+  else doReturn(p);
+}
+
+/** Annule proprement un glissement (re-rendu, changement de fenêtre…) */
+function cancelDrag(){
+  if (!drag) return;
+  const d = drag;
+  cleanupDragListeners();
+  drag = null;
+  // Remet l'état visuel de la pièce : layoutAll la repositionnera ensuite
+  d.el.classList.remove('dragging');
+  d.el.style.transition = '';
+}
+
+/** Perte de focus de la fenêtre pendant un glissement → on repose la pièce */
+function abortDrag(){
+  if (!drag) return;
+  const d = drag;
+  cancelDrag();
+  if (d.active) doReturn(d.piece);
+}
+
+/* ---------------------------------------------------------------------------
+   14. VICTOIRE (confettis + modale)
+   --------------------------------------------------------------------------- */
+function checkWin(){
+  if (state.placed.size === state.grid * state.grid) win();
+}
+
+function win(){
+  state.won = true;
+  state.elapsedMs = elapsed();
+  state.running = false;
+  deselect();
+  updateHUD();
+  sfxWin();
+  launchConfetti();
+
+  $('#winTime').textContent  = fmtTime(state.elapsedMs);
+  $('#winMoves').textContent = state.moves;
+  $('#winLevel').textContent = currentLevelLabel();
+  setTimeout(() => showOverlay(winOverlay), 550);
+}
+
+function launchConfetti(){
+  const cv = $('#confetti');
+  const ctx = cv.getContext('2d');
+  if (!ctx) return;
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+  const colors = ['#7c5cff','#22d3ee','#f472b6','#fbbf24','#34d399','#60a5fa','#ffffff'];
+  const parts = Array.from({ length: 150 }, () => ({
+    x: Math.random() * cv.width,
+    y: -30 - Math.random() * cv.height * .35,
+    vx: (Math.random() - .5) * 3.2,
+    vy: 1.8 + Math.random() * 4.2,
+    s: 6 + Math.random() * 9,
+    c: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+    vr: (Math.random() - .5) * .22,
+  }));
+  const t0 = performance.now();
+  (function frame(t){
+    const alive = t - t0 < 3800;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (const p of parts){
+      p.x += p.vx; p.y += p.vy; p.vy += .05; p.rot += p.vr;
+      if (!alive) continue;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.c;
+      ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6);
+      ctx.restore();
+    }
+    if (alive) requestAnimationFrame(frame);
+    else ctx.clearRect(0, 0, cv.width, cv.height);
+  })(t0);
+}
+
+function showOverlay(el){ el.classList.add('open'); }
+function hideOverlay(el){ el.classList.remove('open'); }
+
+/* ---------------------------------------------------------------------------
+   15. PARTIE / RECOMMANDER
+   --------------------------------------------------------------------------- */
+function newGame(){
+  deselect();
+  hideOverlay(winOverlay);
+  render(true);
+  updateHUD();
+}
+
+/* ---------------------------------------------------------------------------
+   16. ÉVÉNEMENTS
+   --------------------------------------------------------------------------- */
+/* --- Clic / glissement sur les pièces et emplacements (délégation) --- */
+playArea.addEventListener('pointerdown', (e) => {
+  if (state.won || drag) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+  const pieceEl = e.target.closest('.piece');
+  if (pieceEl){ beginDrag(e, pieceEl); return; }
+
+  const slot = e.target.closest('.slot');
+  if (slot){
+    const id = +slot.dataset.id;
+    // Clic sur l'emplacement surligné d'une pièce sélectionnée → pose
+    if (state.selectedId === id && !state.placed.has(id)){
+      doPlace(state.pieces[id]);
+    } else {
+      deselect();
+    }
+    return;
+  }
+  deselect();   // clic à côté → on désélectionne
+});
+
+window.addEventListener('blur', abortDrag);
+
+/* --- Import d'image --- */
+$('#btnImport').addEventListener('click', () => fileInput.click());
+$('#btnWinImport').addEventListener('click', () => { hideOverlay(winOverlay); fileInput.click(); });
+
+fileInput.addEventListener('change', async () => {
+  const file = fileInput.files && fileInput.files[0];
+  fileInput.value = '';                 // permet de re-sélectionmer le même fichier
+  if (!file) return;
+  try {
+    state.imgURL = await readImageFile(file);
+    toast('Image importée ✓');
+    newGame();
+  } catch(_){
+    toast('Impossible de lire cette image 😕');
+  }
+});
+
+/* --- Boutons toolbar --- */
+$('#btnShuffle').addEventListener('click', () => { newGame(); toast('Pièces remélangées 🔀'); });
+
+$('#btnNewImg').addEventListener('click', () => {
+  state.imgURL = makeArt();               // ambiance différente de la précédente
+  toast('Nouvelle image 🎲 — ' + (ART_LABELS[state.artKind] || ''));
+  newGame();
+});
+
+$('#btnPreview').addEventListener('click', () => {
+  imgFull.src = state.imgURL;
+  showOverlay(imgOverlay);
+});
+imgOverlay.addEventListener('click', () => hideOverlay(imgOverlay));
+
+$('#btnSound').addEventListener('click', (e) => {
+  soundOn = !soundOn;
+  e.currentTarget.textContent = soundOn ? '🔊' : '🔇';
+  if (soundOn){ ensureAudio(); sfxTick(); }
+});
+
+/* --- Modale de victoire --- */
+$('#btnReplay').addEventListener('click', () => { newGame(); toast('Bonne chance ! 🍀'); });
+$('#btnCloseWin').addEventListener('click', () => hideOverlay(winOverlay));
+
+/* --- Clavier : Échap ferme les surcouches --- */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){
+    hideOverlay(winOverlay);
+    hideOverlay(imgOverlay);
+    deselect();
+  }
+});
+
+/* --- Redimensionnement (responsive) : repositionnement léger, DOM conservé ---
+   render(false) ne recrée plus les éléments : computeSizes() est sans
+   rétroaction (voir plus haut), donc le ResizeObserver ne déclenche pas
+   de reconstruction en cascade. */
+let resizeTimer = null;
+function scheduleRelayout(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (drag) return;                       // pas de repositionnement en plein glissement
+    render(false);
+  }, 140);
+}
+window.addEventListener('resize', scheduleRelayout);
+if (window.ResizeObserver){
+  new ResizeObserver(scheduleRelayout).observe(boardArea);
+}
+
+/* --- Chronomètre : rafraîchit l'affichage toutes les 250 ms --- */
+setInterval(() => { timeVal.textContent = fmtTime(elapsed()); }, 250);
+
+/* ---------------------------------------------------------------------------
+   17. INITIALISATION
+   --------------------------------------------------------------------------- */
+function init(){
+  state.imgURL = makeArt();                // image d'ambiance générée
+  buildLevelButtons();
+  syncLevelButtons();
+  // On attend un frame pour que la mise en page CSS soit mesurable
+  requestAnimationFrame(() => {
+    render(true);
+  });
+}
+init();
+
+/* Petit hook de débogage / test (inoffensif) */
+window.__puzzle = {
+  state,
+  LEVELS,
+  newGame,
+  render,
+  place(id){ doPlace(state.pieces[id]); },
+  snapRadius,
+  // Galerie procédurale (volet A) — utile pour tests et futur sélecteur
+  art: makeArt,
+  ART_KINDS,
+  ART_LABELS,
+};
+</script>
+<style id="tz-demo-ribbon">
+#tzRibbon{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:inline-flex;align-items:center;gap:8px;
+padding:8px 14px;border-radius:999px;background:rgba(9,25,38,.92);color:#eaf5fb;font:600 12px/1 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+letter-spacing:.02em;box-shadow:0 12px 28px -12px rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.16);text-decoration:none;
+-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:.94;transition:opacity .2s,transform .2s}
+#tzRibbon:hover{opacity:1;transform:translateY(-2px)}
+#tzRibbon b{color:#61d7ef}
+#tzRibbon span.sep{opacity:.45}
+@media (max-width:520px){#tzRibbon{font-size:11px;padding:7px 11px;left:8px;bottom:8px}}
+</style>
+<a id="tzRibbon" href="../../index.html#realisations"><b>TechZen</b> <span class="sep">·</span> Démo jouable <span class="sep">·</span> Retour au site</a>
+
+</body>
+</html>
