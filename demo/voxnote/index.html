@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="VoxNote — Application intelligente de prise de notes au clavier, à la voix et en photos annotées."
+    />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VoxNote" />
+    <meta name="application-name" content="VoxNote" />
+
+    <!-- Icônes PNG + SVG pour installation PWA & création de raccourci Android/iOS -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="shortcut icon" href="./icons/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <title>VoxNote — Notes Vocales & Photos</title>
+
+    <!-- Capture immédiate de l'invitation d'installation Android/Chrome avant le chargement du bundle -->
+    <script>
+      window.__voxnoteDeferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        window.__voxnoteDeferredPrompt = e;
+        window.dispatchEvent(new Event('voxnote-install-ready'));
+      });
+      window.addEventListener('appinstalled', function () {
+        window.__voxnoteDeferredPrompt = null;
+        window.dispatchEvent(new Event('voxnote-installed'));
+      });
+    </script>
+    <script type="module" crossorigin src="./assets/index-2U9__zUN.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CFx4lPra.css">
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900">
+    <div id="root"></div>
+    <!-- démo statique TechZen : service worker non enregistré -->
+  <style id="tz-demo-ribbon">
+#tzRibbon{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:inline-flex;align-items:center;gap:8px;
+padding:8px 14px;border-radius:999px;background:rgba(9,25,38,.92);color:#eaf5fb;font:600 12px/1 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+letter-spacing:.02em;box-shadow:0 12px 28px -12px rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.16);text-decoration:none;
+-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:.94;transition:opacity .2s,transform .2s}
+#tzRibbon:hover{opacity:1;transform:translateY(-2px)}
+#tzRibbon b{color:#61d7ef}
+#tzRibbon span.sep{opacity:.45}
+@media (max-width:520px){#tzRibbon{font-size:11px;padding:7px 11px;left:8px;bottom:8px}}
+</style>
+<a id="tzRibbon" href="../../index.html#realisations"><b>TechZen</b> <span class="sep">·</span> Démo interactive <span class="sep">·</span> Retour au site</a>
+
+</body>
+</html>

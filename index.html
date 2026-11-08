@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1e2c">
+<title>TechZen — Création de sites web, référencement & infrastructure IT à Abidjan</title>
+<meta name="description" content="TechZen conçoit des sites web et des boutiques en ligne performants, booste votre référencement pour vous apporter des clients, analyse vos données et déploie votre infrastructure : réseaux informatiques, Windows Server et vidéosurveillance IP.">
+<meta name="author" content="TechZen">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TechZen">
+<meta property="og:title" content="TechZen — Sites web, e-commerce, référencement & IT">
+<meta property="og:description" content="Créer un site web à votre image, performant et sur-mesure. Référencement, e-commerce, analyse de données, réseaux informatiques, Windows Server et vidéosurveillance.">
+<meta property="og:image" content="assets/img/finatrack-cover.webp">
+<meta property="og:locale" content="fr_CI">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/logo/techzen-favicon-64.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/logo/techzen-mark.png">
+<link rel="apple-touch-icon" href="assets/logo/techzen-mark.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "TechZen",
+  "slogan": "Créez un site web à votre image, performant et sur-mesure.",
+  "description": "Agence digitale et infrastructure IT : création de sites web, référencement naturel, e-commerce, analyse de données, réseaux informatiques, Windows Server et vidéosurveillance IP.",
+  "areaServed": "Côte d'Ivoire",
+  "address": { "@type": "PostalAddress", "addressLocality": "Abidjan", "addressCountry": "CI" },
+  "knowsAbout": ["Création de sites web", "Référencement naturel (SEO)", "E-commerce", "Analyse de données", "Réseaux informatiques", "Windows Server", "Vidéosurveillance IP"]
+}
+</script>
+<script>document.documentElement.classList.remove("no-js");document.documentElement.classList.add("js");</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<!-- ====================== SPRITE D'ICÔNES ====================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+        <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m8 9-3 3 3 3"/><path d="m16 9 3 3-3 3"/><path d="M13.5 6l-3 12"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+        <symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></symbol>
+        <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 10.4a2 2 0 0 0 2 1.6h7.3a2 2 0 0 0 2-1.55L20 8H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></symbol>
+        <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 20h16"/><rect x="7" y="12" width="3" height="5"/><rect x="12" y="8" width="3" height="9"/><rect x="17" y="10" width="3" height="7"/></symbol>
+        <symbol id="i-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="5" rx="1.5"/><rect x="2" y="16" width="6" height="5" rx="1.5"/><rect x="16" y="16" width="6" height="5" rx="1.5"/><path d="M12 8v4"/><path d="M5 16v-2h14v2"/></symbol>
+        <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/><path d="M11 7.5h5M11 16.5h5"/></symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h6A2.5 2.5 0 0 1 15 8.5v7A2.5 2.5 0 0 1 12.5 18h-6A2.5 2.5 0 0 1 4 15.5z"/><path d="m15 11 4-2.5v7L15 13"/></symbol>
+        <symbol id="i-whatsapp" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.9.53 3.68 1.46 5.2L2 22l5.1-1.6a9.86 9.86 0 0 0 4.94 1.32h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm5.76 13.87c-.24.68-1.4 1.3-1.94 1.34-.54.05-1.03.24-2.9-.6-2.26-1.02-3.68-3.35-3.79-3.5-.11-.16-.9-1.2-.9-2.29 0-1.09.57-1.62.77-1.84.2-.22.44-.28.59-.28h.42c.14 0 .32-.05.5.38.19.46.63 1.58.68 1.69.06.11.09.24.02.39-.08.15-.15.24-.3.39-.14.14-.3.32-.43.43-.14.11-.29.24-.12.47.16.23.73 1.2 1.56 1.94 1.07.95 1.98 1.24 2.22 1.35.24.11.38.09.52-.06.14-.15.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.11.4.17.46.27.06.09.06.55-.18 1.23Z"/></symbol>
+        <symbol id="i-arrow-ur" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></symbol>
+        <symbol id="i-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></symbol>
+        <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></symbol>
+        <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h3l2 5-2.5 1.8a12 12 0 0 0 5.7 5.7L15 13l5 2v3a2 2 0 0 1-2.2 2A16 16 0 0 1 3 5.2 2 2 0 0 1 5 3Z"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v6c0 4.4-3.1 7.9-7.5 9-4.4-1.1-7.5-4.6-7.5-9V6L12 3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z"/></symbol>
+        <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.9L19 9.8l-4.2 3.1.6 5.1L12 15.6 8.6 18l.6-5.1L5 9.8l5.1-1.9L12 3Z"/></symbol>
+        <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 18a9 9 0 1 1 15 0"/><path d="m12 14 4-4"/><circle cx="12" cy="15" r="1.4"/></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10" width="15" height="10.5" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></symbol>
+        <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="2.5"/><path d="M9 20h6M12 16.5V20"/></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></symbol>
+        <symbol id="i-db" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+        <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a15 15 0 0 1 18 0"/><path d="M6 12.5a11 11 0 0 1 12 0"/><path d="M9 16a6 6 0 0 1 6 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    </defs>
+</svg>
+
+<!-- ====================== NAVIGATION ====================== -->
+<header class="nav" id="nav">
+    <div class="wrap nav__inner">
+        <a href="#accueil" class="brand" aria-label="TechZen — accueil">
+            <span class="brand__mark"><img src="assets/logo/techzen-mark.png" alt="Logo TechZen" width="42" height="42"></span>
+            <span>
+                <span class="brand__name">Tech<b>Zen</b></span>
+                <span class="brand__tag">Web · Data · Infrastructure</span>
+            </span>
+        </a>
+
+        <nav class="nav__links" aria-label="Navigation principale">
+            <a href="#services">Services</a>
+            <a href="#realisations">Réalisations</a>
+            <a href="#methode">Méthode</a>
+            <a href="#offres">Offres</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="nav__actions">
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Changer de thème" title="Thème clair / sombre">
+                <svg class="icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+                <svg class="icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+            </button>
+            <a class="btn btn--primary btn--sm" href="#contact">
+                Démarrer un projet
+                <svg aria-hidden="true"><use href="#i-arrow-r"/></svg>
+            </a>
+            <button class="nav__burger" id="burger" type="button" aria-expanded="false" aria-controls="mobileNav" aria-label="Ouvrir le menu">
+                <svg class="icon-menu" aria-hidden="true"><use href="#i-menu"/></svg>
+                <svg class="icon-close" aria-hidden="true"><use href="#i-x"/></svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<nav class="mnav" id="mobileNav" aria-label="Navigation mobile">
+    <a href="#services">Services</a>
+    <a href="#realisations">Réalisations</a>
+    <a href="#methode">Méthode</a>
+    <a href="#offres">Offres</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+    <a class="btn btn--wa" href="#" data-wa="Bonjour TechZen, je souhaite discuter de mon projet.">
+        <svg aria-hidden="true"><use href="#i-whatsapp"/></svg> Discuter sur WhatsApp
+    </a>
+</nav>
+
+<main id="main">
+<!-- ====================== HERO ====================== -->
+<section class="hero" id="accueil">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="wrap hero__inner">
+        <div class="hero__copy">
+            <span class="eyebrow"><i class="eyebrow__dot"></i> Agence digitale &amp; infrastructure — Abidjan</span>
+            <h1>Créez un site web <em class="grad-text">à votre image</em>, performant et sur&#8209;mesure.</h1>
+            <p class="hero__sub">
+                Nous concevons des sites et des boutiques en ligne qui <strong>vous amènent des clients</strong> :
+                design soigné, référencement naturel travaillé, données exploitées.
+                Et parce qu'un site repose sur une infrastructure solide, nous installons aussi vos réseaux,
+                votre Windows Server et votre vidéosurveillance.
+            </p>
+            <div class="hero__cta">
+                <a class="btn btn--primary btn--lg" href="#realisations">
+                    Voir nos réalisations
+                    <svg aria-hidden="true"><use href="#i-arrow-r"/></svg>
+                </a>
+                <a class="btn btn--ghost btn--lg" href="#contact">
+                    Demander un devis
+                </a>
+            </div>
+            <div class="hero__meta">
+                <span><svg aria-hidden="true"><use href="#i-check"/></svg> Devis gratuit &amp; sans engagement</span>
+                <span><svg aria-hidden="true"><use href="#i-check"/></svg> Projets 100&nbsp;% sur-mesure</span>
+                <span><svg aria-hidden="true"><use href="#i-check"/></svg> Accompagnement de A à Z</span>
+            </div>
+        </div>
+
+        <div class="hero__visual" aria-hidden="true">
+            <div class="mock">
+                <div class="mock__bar">
+                    <span class="mock__dots"><i></i><i></i><i></i></span>
+                    <span class="mock__url"><svg aria-hidden="true"><use href="#i-lock"/></svg> techzen.ci / tableau-de-bord</span>
+                </div>
+                <div class="mock__body">
+                    <div class="mock__side">
+                        <b><img src="assets/logo/techzen-mark.png" alt=""></b>
+                        <i></i><i></i><i></i><i></i>
+                    </div>
+                    <div class="mock__main">
+                        <div class="mock__title">
+                            <strong>Performance du site</strong>
+                            <span>En direct</span>
+                        </div>
+                        <div class="mock__kpis">
+                            <div class="mock__kpi"><small>Visiteurs</small><strong>1 284</strong></div>
+                            <div class="mock__kpi"><small>Demandes</small><strong>37</strong></div>
+                            <div class="mock__kpi"><small>Conversion</small><strong>2,9 %</strong></div>
+                        </div>
+                        <div class="mock__chart">
+                            <i style="height:38%"></i><i style="height:56%"></i><i style="height:44%"></i>
+                            <i style="height:72%"></i><i style="height:61%"></i><i style="height:88%"></i>
+                            <i style="height:74%"></i><i style="height:96%"></i>
+                        </div>
+                        <div class="mock__rows">
+                            <div class="mock__row"><b></b><span>Référencement local</span><span>+64 %</span></div>
+                            <div class="mock__row"><b></b><span>Boutique en ligne</span><span>18 cmd</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="float-card float-card--seo">
+                <span class="float-card__ico"><svg><use href="#i-search"/></svg></span>
+                <span><strong>1<sup>re</sup> page Google</strong><small>Référencement naturel</small></span>
+            </div>
+            <div class="float-card float-card--data">
+                <span class="float-card__ico"><svg><use href="#i-chart"/></svg></span>
+                <span><strong>Décisions chiffrées</strong><small>Analyse de données</small></span>
+            </div>
+            <div class="float-card float-card--net">
+                <span class="float-card__ico"><svg><use href="#i-network"/></svg></span>
+                <span><strong>Réseau &amp; serveurs</strong><small>Installation &amp; sécurisation</small></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== TECHNOS ====================== -->
+<section class="stack-strip" aria-label="Technologies et expertises">
+    <div class="wrap">
+        <p class="stack-strip__label">Les briques que nous maîtrisons</p>
+    </div>
+    <div class="marquee" aria-hidden="true">
+        <div class="marquee__group">
+            <span class="marquee__item"><svg><use href="#i-code"/></svg> React &amp; Vite</span>
+            <span class="marquee__item"><svg><use href="#i-globe"/></svg> HTML / CSS / JavaScript</span>
+            <span class="marquee__item"><svg><use href="#i-db"/></svg> Supabase &amp; PostgreSQL</span>
+            <span class="marquee__item"><svg><use href="#i-chart"/></svg> Analyse de données</span>
+            <span class="marquee__item"><svg><use href="#i-search"/></svg> SEO technique</span>
+            <span class="marquee__item"><svg><use href="#i-cart"/></svg> E-commerce</span>
+            <span class="marquee__item"><svg><use href="#i-server"/></svg> Windows Server</span>
+            <span class="marquee__item"><svg><use href="#i-network"/></svg> Réseaux &amp; Wi-Fi</span>
+            <span class="marquee__item"><svg><use href="#i-camera"/></svg> Vidéosurveillance IP</span>
+        </div>
+        <div class="marquee__group">
+            <span class="marquee__item"><svg><use href="#i-code"/></svg> React &amp; Vite</span>
+            <span class="marquee__item"><svg><use href="#i-globe"/></svg> HTML / CSS / JavaScript</span>
+            <span class="marquee__item"><svg><use href="#i-db"/></svg> Supabase &amp; PostgreSQL</span>
+            <span class="marquee__item"><svg><use href="#i-chart"/></svg> Analyse de données</span>
+            <span class="marquee__item"><svg><use href="#i-search"/></svg> SEO technique</span>
+            <span class="marquee__item"><svg><use href="#i-cart"/></svg> E-commerce</span>
+            <span class="marquee__item"><svg><use href="#i-server"/></svg> Windows Server</span>
+            <span class="marquee__item"><svg><use href="#i-network"/></svg> Réseaux &amp; Wi-Fi</span>
+            <span class="marquee__item"><svg><use href="#i-camera"/></svg> Vidéosurveillance IP</span>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== SERVICES ====================== -->
+<section class="section" id="services">
+    <div class="wrap">
+        <div class="sec-head sec-head--split">
+            <div>
+                <span class="eyebrow" data-reveal><i class="eyebrow__dot"></i> Nos expertises</span>
+                <h2 class="h-sec" style="margin-top:1rem;--d:60ms" data-reveal>
+                    Du site web au réseau,<br><span class="grad-text">une seule équipe.</span>
+                </h2>
+            </div>
+            <div data-reveal style="--d:120ms">
+                <p class="lede">
+                    Un site qui ne se contente pas d'être beau : il doit être trouvé, convaincre, vendre —
+                    et s'appuyer sur une infrastructure fiable. Nous couvrons toute la chaîne, du référencement
+                    à la baie de brassage.
+                </p>
+            </div>
+        </div>
+
+        <div class="services">
+            <article class="svc" data-reveal style="--d:0ms">
+                <span class="svc__ico"><svg aria-hidden="true"><use href="#i-code"/></svg></span>
+                <h3>Création de sites &amp; applications web</h3>
+                <p>Des interfaces modernes, rapides et pensées pour convertir, développées sur-mesure.</p>
+                <ul class="svc__list">
+                    <li>Sites vitrines &amp; portfolios</li>
+                    <li>Applications web métier &amp; PWA installables</li>
+                    <li>Design responsive et accessible</li>
+                </ul>
+            </article>
+
+            <article class="svc" data-reveal style="--d:70ms">
+                <span class="svc__ico"><svg aria-hidden="true"><use href="#i-search"/></svg></span>
+                <h3>Référencement &amp; acquisition de clients</h3>
+                <p>Être visible au bon moment, sur les bonnes requêtes, pour générer de vraies demandes.</p>
+                <ul class="svc__list">
+                    <li>Audit SEO technique &amp; sémantique</li>
+                    <li>SEO local (Abidjan &amp; Côte d'Ivoire)</li>
+                    <li>Fiches Google Business &amp; annuaires</li>
+                </ul>
+            </article>
+
+            <article class="svc" data-reveal style="--d:140ms">
+                <span class="svc__ico"><svg aria-hidden="true"><use href="#i-cart"/></svg></span>
+                <h3>Sites e-commerce</h3>
+                <p>Une boutique en ligne rapide, claire, et surtout trouvable : le SEO appliqué à la vente.</p>
+                <ul class="svc__list">
+                    <li>Catalogue, panier, paiement mobile money</li>
+                    <li>Fiches produits optimisées pour Google</li>
+                    <li>Parcours d'achat sans friction</li>
+                </ul>
+            </article>
+
+            <article class="svc" data-reveal style="--d:0ms">
+                <span class="svc__ico"><svg aria-hidden="true"><use href="#i-chart"/></svg></span>
+                <h3>Analyse de données</h3>
+                <p>Vos données ne dorment plus : nous les transformons en indicateurs et en décisions.</p>
+                <ul class="svc__list">
+                    <li>Tableaux de bord &amp; KPI sur-mesure</li>
+                    <li>Rapports automatiques (ventes, trafic, terrain)</li>
+                    <li>Nettoyage, fiabilisation et suivi</li>
+                </ul>
+            </article>
+
+            <article class="svc" data-reveal style="--d:70ms">
+                <span class="svc__ico"><svg aria-hidden="true"><use href="#i-network"/></svg></span>
+                <h3>Réseaux informatiques</h3>
+                <p>Nous améliorons un réseau existant ou mettons en place une infrastructure neuve, propre et documentée.</p>
+                <ul class="svc__list">
+                    <li>Audit et refonte du réseau existant</li>
+                    <li>Wi-Fi, VLAN, VPN, pare-feu, câblage</li>
+                    <li>Partage de fichiers &amp; accès distant sécurisé</li>
+                </ul>
+            </article>
+
+            <article class="svc" data-reveal style="--d:140ms">
+                <span class="svc__ico"><svg aria-hidden="true"><use href="#i-server"/></svg></span>
+                <h3>Windows Server &amp; vidéosurveillance</h3>
+                <p>Le socle qui fait tourner l'entreprise : comptes, droits, sauvegardes et surveillance des lieux.</p>
+                <ul class="svc__list">
+                    <li>Windows Server : AD, DNS, DHCP, GPO, partages</li>
+                    <li>Caméras IP, NVR et consultation à distance</li>
+                    <li>Sauvegardes &amp; stratégie de sécurité</li>
+                </ul>
+            </article>
+        </div>
+
+        <div class="also" data-reveal>
+            <strong>Et aussi :</strong>
+            <div class="chips">
+                <span class="chip"><svg><use href="#i-globe"/></svg> Nom de domaine &amp; hébergement</span>
+                <span class="chip"><svg><use href="#i-lock"/></svg> Certificat HTTPS</span>
+                <span class="chip"><svg><use href="#i-gauge"/></svg> Optimisation des performances</span>
+                <span class="chip"><svg><use href="#i-shield"/></svg> Maintenance &amp; mises à jour</span>
+                <span class="chip"><svg><use href="#i-spark"/></svg> Identité visuelle</span>
+                <span class="chip"><svg><use href="#i-monitor"/></svg> Formation &amp; prise en main</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== RÉALISATIONS ====================== -->
+<section class="section section--tint" id="realisations">
+    <div class="wrap">
+        <div class="sec-head sec-head--center" data-reveal>
+            <span class="eyebrow"><i class="eyebrow__dot"></i> Réalisations</span>
+            <h2 class="h-sec">Des projets réels, <span class="grad-text">en production</span>.</h2>
+            <p class="lede">
+                Applications web et mobiles, jeux, outils de pilotage : chaque projet est unique.
+                Testez-les directement ici — les démos s'ouvrent dans votre navigateur, sans compte.
+            </p>
+        </div>
+
+        <div class="filters" role="group" aria-label="Filtrer les réalisations" data-reveal>
+            <button class="filter is-active" type="button" data-filter="all">Tous les projets</button>
+            <button class="filter" type="button" data-filter="web">Web &amp; PWA</button>
+            <button class="filter" type="button" data-filter="app">Applications &amp; data</button>
+            <button class="filter" type="button" data-filter="game">Expériences interactives</button>
+        </div>
+
+        <div class="projects" id="projects">
+            <!-- FinaTrack (projet vedette) -->
+            <article class="project project--feature" data-cat="app web" data-reveal>
+                <div class="project__media">
+                    <img src="assets/img/finatrack-cover.webp" alt="FinaTrack CI — tableau de bord budgétaire sur ordinateur et mobile" loading="lazy" width="1200" height="675" data-main>
+                    <a class="project__open" href="demo/finatrack.html">
+                        <svg aria-hidden="true"><use href="#i-play"/></svg> Ouvrir la démo
+                    </a>
+                    <div class="project__thumbs">
+                        <button type="button" data-full="assets/img/finatrack-analyses.webp" data-caption="FinaTrack — écran d'analyse des dépenses"><img src="assets/img/finatrack-analyses.webp" alt="FinaTrack — écran d'analyse des dépenses" loading="lazy"></button>
+                        <button type="button" data-full="assets/img/finatrack-mobile.webp" data-caption="FinaTrack — versions mobiles accueil, budget et épargne"><img src="assets/img/finatrack-mobile.webp" alt="FinaTrack — versions mobiles accueil, budget et épargne" loading="lazy"></button>
+                    </div>
+                    <button class="zoom-btn" type="button" data-zoom aria-label="Agrandir les visuels">
+                        <svg aria-hidden="true"><use href="#i-search"/></svg>
+                    </button>
+                </div>
+                <div class="project__body">
+                    <div class="project__head">
+                        <span class="project__cat"><i></i> Application web &amp; PWA · Data</span>
+                        <span class="project__badge">Démo interactive</span>
+                    </div>
+                    <h3>FinaTrack CI</h3>
+                    <p>
+                        Application de pilotage budgétaire pensée pour Abidjan : solde réel, budgets,
+                        épargne, analyses par catégorie et saisie vocale des dépenses. Un exemple concret
+                        de ce que nous faisons en <strong>analyse de données utiles au quotidien</strong> —
+                        chiffres clairs, décisions immédiates.
+                    </p>
+                    <div class="project__tags">
+                        <span class="tag">HTML / CSS / JS</span>
+                        <span class="tag">Supabase</span>
+                        <span class="tag">PWA hors-ligne</span>
+                        <span class="tag">Data visualisation</span>
+                    </div>
+                    <div class="project__actions">
+                        <a class="link-btn link-btn--solid" href="demo/finatrack.html">
+                            <svg aria-hidden="true"><use href="#i-play"/></svg> Tester l'application
+                        </a>
+                        <a class="link-btn" href="https://finnatrack.netlify.app" target="_blank" rel="noopener noreferrer">
+                            Ouvrir en ligne <svg aria-hidden="true"><use href="#i-arrow-ur"/></svg>
+                        </a>
+                        <a class="link-btn" href="https://github.com/Bervellearnaud/finatrack" target="_blank" rel="noopener noreferrer">
+                            <svg aria-hidden="true"><use href="#i-github"/></svg> Code source
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- VoxNote -->
+            <article class="project" data-cat="web app" data-reveal style="--d:60ms">
+                <div class="project__media">
+                    <img src="assets/img/voxnote-cover.webp" alt="VoxNote — application de prise de notes vocales sur ordinateur et mobile" loading="lazy" width="1200" height="675" data-main>
+                    <a class="project__open" href="demo/voxnote/">
+                        <svg aria-hidden="true"><use href="#i-play"/></svg> Ouvrir la démo
+                    </a>
+                    <div class="project__thumbs">
+                        <button type="button" data-full="assets/img/voxnote-mobile.webp" data-caption="VoxNote — dictée vocale et partage WhatsApp"><img src="assets/img/voxnote-mobile.webp" alt="VoxNote — dictée vocale et partage WhatsApp" loading="lazy"></button>
+                        <button type="button" data-full="assets/img/voxnote-auth.webp" data-caption="VoxNote — connexion, capture photo et installation PWA"><img src="assets/img/voxnote-auth.webp" alt="VoxNote — connexion, capture photo et installation PWA" loading="lazy"></button>
+                    </div>
+                    <button class="zoom-btn" type="button" data-zoom aria-label="Agrandir les visuels">
+                        <svg aria-hidden="true"><use href="#i-search"/></svg>
+                    </button>
+                </div>
+                <div class="project__body">
+                    <div class="project__head">
+                        <span class="project__cat"><i></i> Web app · PWA</span>
+                        <span class="project__badge">Démo interactive</span>
+                    </div>
+                    <h3>VoxNote</h3>
+                    <p>
+                        Prendre des notes au clavier, à la voix en temps réel ou en photos annotées.
+                        Une PWA installable, synchronisée et sécurisée : l'exemple parfait d'une
+                        application métier sur-mesure.
+                    </p>
+                    <div class="project__tags">
+                        <span class="tag">React + Vite</span>
+                        <span class="tag">Web Speech API</span>
+                        <span class="tag">Supabase</span>
+                        <span class="tag">PWA</span>
+                    </div>
+                    <div class="project__actions">
+                        <a class="link-btn link-btn--solid" href="demo/voxnote/">
+                            <svg aria-hidden="true"><use href="#i-play"/></svg> Tester la démo
+                        </a>
+                        <a class="link-btn" href="https://github.com/Bervellearnaud/VoxNote" target="_blank" rel="noopener noreferrer">
+                            <svg aria-hidden="true"><use href="#i-github"/></svg> Code source
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Paintball 2D -->
+            <article class="project project--feature project--flip" data-cat="game web" data-reveal style="--d:120ms">
+                <div class="project__media">
+                    <img src="assets/img/paintball-cover.webp" alt="PAINTBALL 2D — Splat Arena, jeu d'arcade vue de dessus" loading="lazy" width="1200" height="675" data-main>
+                    <a class="project__open" href="demo/splat-arena.html">
+                        <svg aria-hidden="true"><use href="#i-play"/></svg> Jouer maintenant
+                    </a>
+                    <div class="project__thumbs">
+                        <button type="button" data-full="assets/img/paintball-mobile.webp" data-caption="PAINTBALL 2D — format mobile vertical"><img src="assets/img/paintball-mobile.webp" alt="PAINTBALL 2D — format mobile vertical" loading="lazy"></button>
+                    </div>
+                    <button class="zoom-btn" type="button" data-zoom aria-label="Agrandir les visuels">
+                        <svg aria-hidden="true"><use href="#i-search"/></svg>
+                    </button>
+                </div>
+                <div class="project__body">
+                    <div class="project__head">
+                        <span class="project__cat"><i></i> Jeu web · Canvas</span>
+                        <span class="project__badge">Jouable ici</span>
+                    </div>
+                    <h3>PAINTBALL 2D — Splat Arena</h3>
+                    <p>
+                        Un arcade nerveux jouable au clavier, au tactile et à la manette, optimisé
+                        pour tenir dans un seul fichier. La preuve qu'une expérience interactive
+                        peut être fluide, légère et amusante.
+                    </p>
+                    <div class="project__tags">
+                        <span class="tag">TypeScript</span>
+                        <span class="tag">Canvas 2D</span>
+                        <span class="tag">Gameplay temps réel</span>
+                        <span class="tag">Mobile</span>
+                    </div>
+                    <div class="project__actions">
+                        <a class="link-btn link-btn--solid" href="demo/splat-arena.html">
+                            <svg aria-hidden="true"><use href="#i-play"/></svg> Lancer le jeu
+                        </a>
+                        <a class="link-btn" href="https://painballvoom.netlify.app" target="_blank" rel="noopener noreferrer">
+                            Ouvrir en ligne <svg aria-hidden="true"><use href="#i-arrow-ur"/></svg>
+                        </a>
+                        <a class="link-btn" href="https://github.com/Bervellearnaud/2DPrintDashBall" target="_blank" rel="noopener noreferrer">
+                            <svg aria-hidden="true"><use href="#i-github"/></svg> Code source
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Puzzle Studio -->
+            <article class="project" data-cat="game web" data-reveal style="--d:60ms">
+                <div class="project__media">
+                    <img src="assets/img/puzzle-devices.webp" alt="Puzzle Studio — jeu de puzzle sur ordinateur, tablette et mobile" loading="lazy" width="1200" height="675" data-main>
+                    <a class="project__open" href="demo/puzzle/">
+                        <svg aria-hidden="true"><use href="#i-play"/></svg> Jouer maintenant
+                    </a>
+                    <button class="zoom-btn" type="button" data-zoom aria-label="Agrandir les visuels">
+                        <svg aria-hidden="true"><use href="#i-search"/></svg>
+                    </button>
+                </div>
+                <div class="project__body">
+                    <div class="project__head">
+                        <span class="project__cat"><i></i> Jeu web · Hors-ligne</span>
+                        <span class="project__badge">Jouable ici</span>
+                    </div>
+                    <h3>Puzzle Studio</h3>
+                    <p>
+                        Un jeu de puzzle complet, autonome et fonctionnel hors-ligne, avec images
+                        générées à la volée et six niveaux jusqu'à 1 296 pièces. Zéro dépendance,
+                        zéro friction.
+                    </p>
+                    <div class="project__tags">
+                        <span class="tag">HTML / CSS / JS</span>
+                        <span class="tag">Génération canvas</span>
+                        <span class="tag">Hors-ligne</span>
+                        <span class="tag">Responsive</span>
+                    </div>
+                    <div class="project__actions">
+                        <a class="link-btn link-btn--solid" href="demo/puzzle/">
+                            <svg aria-hidden="true"><use href="#i-play"/></svg> Lancer le jeu
+                        </a>
+                        <a class="link-btn" href="https://github.com/Bervellearnaud/MYPUZZLE" target="_blank" rel="noopener noreferrer">
+                            <svg aria-hidden="true"><use href="#i-github"/></svg> Code source
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <p style="margin-top:1.5rem;font-size:.85rem;color:var(--muted)" data-reveal>
+            Les démos sont des copies de démonstration exécutées localement : vos essais restent dans votre navigateur.
+        </p>
+    </div>
+</section>
+
+<!-- ====================== CHIFFRES ====================== -->
+<section class="section" style="padding-block:clamp(1rem,3vw,2.5rem)">
+    <div class="wrap">
+        <div class="metrics" data-reveal>
+            <div class="metric">
+                <span class="metric__value" data-count="48" data-suffix=" h">48 h</span>
+                <span class="metric__label">délai de réponse à votre demande de devis</span>
+            </div>
+            <div class="metric">
+                <span class="metric__value" data-count="6" data-suffix="">6</span>
+                <span class="metric__label">expertises complémentaires, du web au réseau</span>
+            </div>
+            <div class="metric">
+                <span class="metric__value">100&nbsp;%</span>
+                <span class="metric__label">sur-mesure : votre cahier des charges, pas un template</span>
+            </div>
+            <div class="metric">
+                <span class="metric__value">1</span>
+                <span class="metric__label">interlocuteur unique, de la maquette à la mise en service</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== SEO / CROISSANCE ====================== -->
+<section class="section section--soft" id="croissance">
+    <div class="wrap split">
+        <div>
+            <span class="eyebrow" data-reveal><i class="eyebrow__dot"></i> Référencement &amp; croissance</span>
+            <h2 class="h-sec" style="margin:1rem 0 1.1rem" data-reveal>
+                Un beau site ne suffit pas.<br><span class="grad-text">Il doit vous amener des clients.</span>
+            </h2>
+            <p class="lede" data-reveal>
+                Nous ne livrons pas un site « et puis voilà ». Nous travaillons la structure, les contenus
+                et les données pour que votre entreprise soit trouvée par les personnes qui cherchent
+                exactement ce que vous proposez.
+            </p>
+            <ul class="checks" data-reveal style="--d:80ms">
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>
+                        <strong>Être trouvé sur Google</strong>
+                        <span>Recherche de mots-clés, balises, contenus, maillage interne et suivi dans Search Console.</span>
+                    </span>
+                </li>
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>
+                        <strong>Attirer une clientèle locale</strong>
+                        <span>SEO local, fiche Google Business, pages par ville ou par service, avis clients.</span>
+                    </span>
+                </li>
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>
+                        <strong>Transformer les visites en demandes</strong>
+                        <span>Parcours clairs, appels à l'action, formulaires et WhatsApp intégrés, pages rapides.</span>
+                    </span>
+                </li>
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>
+                        <strong>Le même travail sur votre boutique en ligne</strong>
+                        <span>Fiches produits optimisées, catégories structurées, données produit et tunnels d'achat.</span>
+                    </span>
+                </li>
+            </ul>
+            <div class="hero__cta" style="margin-top:1.6rem;--d:140ms" data-reveal>
+                <a class="btn btn--primary" href="#contact">Auditer mon site <svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
+                <a class="btn btn--ghost" href="#offres">Voir les offres</a>
+            </div>
+        </div>
+
+        <div class="panel" data-reveal style="--d:100ms">
+            <div class="panel__head">
+                <strong>Trafic organique</strong>
+                <span><i></i> Données de suivi</span>
+            </div>
+            <div class="growth" role="img" aria-label="Histogramme illustrant la progression du trafic organique sur huit mois">
+                <i style="--h:26%;--d:0ms"></i>
+                <i style="--h:34%;--d:60ms"></i>
+                <i style="--h:31%;--d:120ms"></i>
+                <i style="--h:45%;--d:180ms"></i>
+                <i style="--h:58%;--d:240ms"></i>
+                <i style="--h:66%;--d:300ms"></i>
+                <i style="--h:81%;--d:360ms"></i>
+                <i style="--h:96%;--d:420ms"></i>
+            </div>
+            <div class="panel__legend"><span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span>M6</span><span>M7</span><span>M8</span></div>
+            <div class="panel__stats">
+                <div class="panel__stat"><small>Visibilité</small><strong>+128 %</strong><em>8 mois</em></div>
+                <div class="panel__stat"><small>Demandes</small><strong>×2,4</strong><em>entrantes</em></div>
+                <div class="panel__stat"><small>Coût / lead</small><strong>−41 %</strong><em>vs pub</em></div>
+            </div>
+            <p style="font-size:.72rem;color:var(--muted);margin:0">
+                Illustration d'un accompagnement type. Les résultats dépendent du secteur, de la concurrence et du point de départ.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== MÉTHODE ====================== -->
+<section class="section" id="methode">
+    <div class="wrap">
+        <div class="sec-head sec-head--center" data-reveal>
+            <span class="eyebrow"><i class="eyebrow__dot"></i> Notre méthode</span>
+            <h2 class="h-sec">Simple, cadrée, <span class="grad-text">sans surprise</span>.</h2>
+            <p class="lede">Quatre étapes, des points de validation clairs, et un livrable qui fonctionne vraiment.</p>
+        </div>
+
+        <div class="steps">
+            <article class="step" data-reveal style="--d:0ms">
+                <span class="step__num">01</span>
+                <h3>Cadrage</h3>
+                <p>On écoute votre activité, vos clients et vos objectifs. Nous formalisons le périmètre, les pages, les priorités et le budget.</p>
+            </article>
+            <article class="step" data-reveal style="--d:80ms">
+                <span class="step__num">02</span>
+                <h3>Conception &amp; développement</h3>
+                <p>Maquettes, puis intégration responsive. Vous validez à chaque étape, sur ordinateur comme sur mobile.</p>
+            </article>
+            <article class="step" data-reveal style="--d:160ms">
+                <span class="step__num">03</span>
+                <h3>Référencement &amp; mise en ligne</h3>
+                <p>Structure SEO, performances, nom de domaine, HTTPS, hébergement, formulaires et sauvegardes.</p>
+            </article>
+            <article class="step" data-reveal style="--d:240ms">
+                <span class="step__num">04</span>
+                <h3>Mesure &amp; amélioration</h3>
+                <p>Tableaux de bord, rapports et ajustements continus : on regarde les chiffres, on corrige, on progresse.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== INFRASTRUCTURE ====================== -->
+<section class="section section--tint" id="infrastructure">
+    <div class="wrap split">
+        <div class="panel" data-reveal style="order:2">
+            <div class="panel__head">
+                <strong>Infrastructure du site / bureau</strong>
+                <span><i></i> Opérationnel</span>
+            </div>
+            <div style="display:grid;gap:.55rem">
+                <div class="method" style="padding:.7rem .8rem">
+                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-globe"/></svg></span>
+                    <span><small>Accès internet</small><strong>Fibre + secours 4G</strong></span>
+                    <span class="chip" style="margin-left:auto">OK</span>
+                </div>
+                <div class="method" style="padding:.7rem .8rem">
+                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-network"/></svg></span>
+                    <span><small>Réseau local</small><strong>VLAN direction · bureau · Wi-Fi invités</strong></span>
+                    <span class="chip" style="margin-left:auto">OK</span>
+                </div>
+                <div class="method" style="padding:.7rem .8rem">
+                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-server"/></svg></span>
+                    <span><small>Windows Server</small><strong>AD DS · DNS · DHCP · GPO · partages</strong></span>
+                    <span class="chip" style="margin-left:auto">OK</span>
+                </div>
+                <div class="method" style="padding:.7rem .8rem">
+                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-shield"/></svg></span>
+                    <span><small>Sauvegardes</small><strong>Quotidiennes, testées, externalisées</strong></span>
+                    <span class="chip" style="margin-left:auto">OK</span>
+                </div>
+                <div class="method" style="padding:.7rem .8rem">
+                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-camera"/></svg></span>
+                    <span><small>Vidéosurveillance</small><strong>8 caméras IP · NVR · accès mobile</strong></span>
+                    <span class="chip" style="margin-left:auto">OK</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="order:1">
+            <span class="eyebrow" data-reveal><i class="eyebrow__dot"></i> Infrastructure &amp; sécurité</span>
+            <h2 class="h-sec" style="margin:1rem 0 1.1rem" data-reveal>
+                Un site rapide a besoin<br><span class="grad-text">d'un réseau solide.</span>
+            </h2>
+            <p class="lede" data-reveal>
+                Nous intervenons aussi sur le terrain : là où sont vos postes, votre serveur et vos caméras.
+                Que votre réseau existe déjà ou qu'il soit à créer, nous le concevons, le sécurisons et le documentons.
+            </p>
+            <ul class="checks" data-reveal style="--d:80ms">
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span><strong>Améliorer un réseau existant</strong><span>Audit, suppression des points faibles, segmentation, Wi-Fi couvrant, débit et stabilité.</span></span>
+                </li>
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span><strong>Mettre en place un nouveau réseau</strong><span>Étude, câblage, baie de brassage, switchs, adressage IP, partages et accès à distance.</span></span>
+                </li>
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span><strong>Windows Server</strong><span>Installation, domaine Active Directory, comptes et droits, stratégies de groupe, impression, sauvegardes.</span></span>
+                </li>
+                <li>
+                    <svg aria-hidden="true"><use href="#i-check"/></svg>
+                    <span><strong>Vidéosurveillance</strong><span>Choix et pose des caméras IP, configuration du NVR, consultation sécurisée depuis le téléphone.</span></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== OFFRES ====================== -->
+<section class="section" id="offres">
+    <div class="wrap">
+        <div class="sec-head sec-head--center" data-reveal>
+            <span class="eyebrow"><i class="eyebrow__dot"></i> Nos offres</span>
+            <h2 class="h-sec">Trois façons de <span class="grad-text">démarrer</span>.</h2>
+            <p class="lede">Chaque projet est chiffré sur-mesure après un premier échange gratuit. Voici nos cadres d'intervention.</p>
+        </div>
+
+        <div class="offers">
+            <article class="offer" data-reveal style="--d:0ms">
+                <span class="offer__label">Présence</span>
+                <h3>Site vitrine professionnel</h3>
+                <p>Pour être crédible en ligne et présenter clairement votre activité.</p>
+                <ul class="offer__list">
+                    <li>Site sur-mesure responsive (jusqu'à 6 pages)</li>
+                    <li>Nom de domaine, hébergement, HTTPS</li>
+                    <li>Formulaires de contact + WhatsApp</li>
+                    <li>Bases SEO techniques</li>
+                    <li>Formation à la mise à jour</li>
+                </ul>
+                <a class="btn btn--ghost btn--block" href="#contact">Demander un devis</a>
+            </article>
+
+            <article class="offer offer--feature" data-reveal style="--d:80ms">
+                <span class="offer__flag">Le plus demandé</span>
+                <span class="offer__label">Croissance</span>
+                <h3>Site + référencement</h3>
+                <p>Pour ne plus seulement exister : attirer des visiteurs qualifiés et des demandes de clients.</p>
+                <ul class="offer__list">
+                    <li>Tout le pack Présence</li>
+                    <li>Recherche de mots-clés &amp; contenus optimisés</li>
+                    <li>SEO local + fiche Google Business</li>
+                    <li>Suivi de positions &amp; Search Console</li>
+                    <li>Tableau de bord des résultats</li>
+                    <li>Accompagnement mensuel</li>
+                </ul>
+                <a class="btn btn--primary btn--block" href="#contact">Parler de mon projet <svg aria-hidden="true"><use href="#i-arrow-r"/></svg></a>
+            </article>
+
+            <article class="offer" data-reveal style="--d:160ms">
+                <span class="offer__label">Boutique &amp; IT</span>
+                <h3>E-commerce ou infrastructure</h3>
+                <p>Vendre en ligne avec un site optimisé, ou consolider votre réseau et vos serveurs.</p>
+                <ul class="offer__list">
+                    <li>Boutique en ligne + paiement</li>
+                    <li>SEO produit &amp; tunnels d'achat</li>
+                    <li>Réseau, Wi-Fi, Windows Server</li>
+                    <li>Vidéosurveillance IP</li>
+                    <li>Sauvegardes &amp; maintenance</li>
+                </ul>
+                <a class="btn btn--ghost btn--block" href="#contact">Étudier ma demande</a>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== FAQ ====================== -->
+<section class="section section--tint" id="faq">
+    <div class="wrap">
+        <div class="sec-head sec-head--center" data-reveal>
+            <span class="eyebrow"><i class="eyebrow__dot"></i> Questions fréquentes</span>
+            <h2 class="h-sec">Bon à savoir</h2>
+        </div>
+
+        <div class="faq" data-reveal>
+            <details class="qa">
+                <summary>Combien de temps faut-il pour créer un site web ?</summary>
+                <div class="qa__body">
+                    Un site vitrine bien cadré se livre généralement en 2 à 4 semaines.
+                    Une boutique en ligne ou une application métier demande davantage de préparation
+                    (catalogue, paiements, données) : comptez 4 à 8 semaines. Le planning est fixé
+                    dès le cadrage et dépend surtout de la disponibilité des contenus.
+                </div>
+            </details>
+            <details class="qa">
+                <summary>Le référencement est-il vraiment inclus ?</summary>
+                <div class="qa__body">
+                    Nous appliquons systématiquement les bases techniques du SEO (structure, vitesse,
+                    balises, sitemap, données structurées) dans tous nos projets. Le travail de fond —
+                    mots-clés, contenus, netlinking, suivi mensuel — fait partie de notre offre Croissance,
+                    pour laquelle nous définissons ensemble des objectifs mesurables.
+                </div>
+            </details>
+            <details class="qa">
+                <summary>Pouvez-vous travailler sur un site ou un réseau déjà existant ?</summary>
+                <div class="qa__body">
+                    Oui, c'est même fréquent. Nous réalisons un audit du site existant ou du réseau en place,
+                    puis nous proposons des améliorations ciblées : performances, structure SEO, sécurité,
+                    stabilité du Wi-Fi, adressage IP, postes de travail. Vous décidez ensuite des priorités.
+                </div>
+            </details>
+            <details class="qa">
+                <summary>Qui conserve le site, le nom de domaine et les accès ?</summary>
+                <div class="qa__body">
+                    Vous restez propriétaire de tout : nom de domaine, hébergement, code, contenus et accès.
+                    Nous vous transmettons les identifiants et la documentation en fin de projet. Aucun
+                    verrouillage technique.
+                </div>
+            </details>
+            <details class="qa">
+                <summary>Intervenez-vous en dehors d'Abidjan ?</summary>
+                <div class="qa__body">
+                    Nous sommes basés à Abidjan et intervenons dans toute la Côte d'Ivoire pour les
+                    projets web, l'analyse de données et le référencement (tout se fait à distance).
+                    Pour les interventions physiques — réseaux, serveurs, vidéosurveillance — nous
+                    planifions un déplacement sur site afin de réaliser l'audit et l'installation.
+                </div>
+            </details>
+            <details class="qa">
+                <summary>Assurez-vous la maintenance après la livraison ?</summary>
+                <div class="qa__body">
+                    Oui. Nous proposons un accompagnement continu : mises à jour, sauvegardes, surveillance,
+                    corrections et évolutions. C'est optionnel, sans engagement de durée, et vous pouvez
+                    aussi choisir d'assurer vous-même la maintenance avec notre documentation.
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== CONTACT ====================== -->
+<section class="section" id="contact">
+    <div class="wrap">
+        <div class="contact" data-reveal>
+            <div class="contact__copy">
+                <span class="eyebrow"><i class="eyebrow__dot"></i> Contact</span>
+                <h2 class="h-sec">Parlons de <span class="grad-text">votre projet</span>.</h2>
+                <p class="lede">
+                    Décrivez-nous votre besoin en quelques lignes : site web, boutique en ligne,
+                    référencement, analyse de données ou infrastructure. Nous revenons vers vous
+                    avec une proposition claire — et gratuite.
+                </p>
+
+                <div class="contact__methods">
+                    <a class="method" href="#" data-wa="Bonjour TechZen, je souhaite discuter de mon projet.">
+                        <span class="method__ico"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg></span>
+                        <span><small>Le plus rapide</small><strong>Écrire sur WhatsApp</strong></span>
+                    </a>
+                    <a class="method" href="mailto:contact@techzen.ci?subject=Projet%20web%20-%20TechZen">
+                        <span class="method__ico"><svg aria-hidden="true"><use href="#i-mail"/></svg></span>
+                        <span><small>E-mail</small><strong>contact@techzen.ci</strong></span>
+                    </a>
+                    <div class="method">
+                        <span class="method__ico"><svg aria-hidden="true"><use href="#i-pin"/></svg></span>
+                        <span><small>Basés à</small><strong>Abidjan, Côte d'Ivoire</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <form class="form" id="projectForm" novalidate>
+                <div class="field">
+                    <label for="f-name">Votre nom</label>
+                    <input id="f-name" name="name" type="text" placeholder="Ex. Awa Koné" autocomplete="name" required>
+                </div>
+                <div class="field--row">
+                    <div class="field">
+                        <label for="f-email">E-mail</label>
+                        <input id="f-email" name="email" type="email" placeholder="vous@entreprise.ci" autocomplete="email" required>
+                    </div>
+                    <div class="field">
+                        <label for="f-phone">Téléphone / WhatsApp</label>
+                        <input id="f-phone" name="phone" type="tel" placeholder="+225 07 00 00 00 00" autocomplete="tel">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="f-need">Votre besoin</label>
+                    <select id="f-need" name="need">
+                        <option>Création de site web</option>
+                        <option>Référencement / SEO</option>
+                        <option>Site e-commerce</option>
+                        <option>Analyse de données</option>
+                        <option>Réseau informatique</option>
+                        <option>Windows Server</option>
+                        <option>Vidéosurveillance</option>
+                        <option>Plusieurs de ces services</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="f-msg">Votre projet</label>
+                    <textarea id="f-msg" name="message" placeholder="Dites-nous en quelques mots ce que vous souhaitez accomplir." required></textarea>
+                </div>
+                <button class="btn btn--primary btn--block btn--lg" type="submit">
+                    Envoyer ma demande
+                    <svg aria-hidden="true"><use href="#i-arrow-r"/></svg>
+                </button>
+                <p class="form__status" id="formStatus" role="status"></p>
+                <p class="form__note">
+                    En envoyant, votre message s'ouvre pré-rempli dans WhatsApp. Aucune donnée n'est stockée sur ce site.
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== CTA FINAL ====================== -->
+<section class="section" style="padding-top:0">
+    <div class="wrap">
+        <div class="cta-band" data-reveal>
+            <h2 class="h-sec" style="font-size:clamp(1.6rem,1.2rem+1.6vw,2.3rem)">Prêt à donner vie à votre projet&nbsp;?</h2>
+            <p class="lede" style="text-align:center">Un échange de 15 minutes suffit pour savoir par où commencer.</p>
+            <div class="hero__cta" style="justify-content:center">
+                <a class="btn btn--wa btn--lg" href="#" data-wa="Bonjour TechZen, je souhaite prendre rendez-vous pour parler de mon projet.">
+                    <svg aria-hidden="true"><use href="#i-whatsapp"/></svg> Discuter sur WhatsApp
+                </a>
+                <a class="btn btn--ghost btn--lg" href="mailto:contact@techzen.ci">Nous écrire</a>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="footer">
+    <div class="wrap">
+        <div class="footer__grid">
+            <div class="footer__brand">
+                <a href="#accueil" class="brand" aria-label="TechZen">
+                    <span class="brand__mark"><img src="assets/logo/techzen-mark.png" alt="Logo TechZen" width="42" height="42"></span>
+                    <span>
+                        <span class="brand__name">Tech<b>Zen</b></span>
+                        <span class="brand__tag">Web · Data · Infrastructure</span>
+                    </span>
+                </a>
+                <p>Créez un site web à votre image, performant et sur-mesure — et l'infrastructure qui va avec.</p>
+                <div class="socials">
+                    <a href="https://github.com/Bervellearnaud" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                        <svg aria-hidden="true"><use href="#i-github"/></svg>
+                    </a>
+                    <a href="#" data-wa="Bonjour TechZen !" aria-label="WhatsApp">
+                        <svg aria-hidden="true"><use href="#i-whatsapp"/></svg>
+                    </a>
+                    <a href="mailto:contact@techzen.ci" aria-label="E-mail">
+                        <svg aria-hidden="true"><use href="#i-mail"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <h4>Services</h4>
+                <nav class="footer__links" aria-label="Services">
+                    <a href="#services">Création de sites web</a>
+                    <a href="#croissance">Référencement &amp; SEO</a>
+                    <a href="#services">Sites e-commerce</a>
+                    <a href="#services">Analyse de données</a>
+                    <a href="#infrastructure">Réseaux informatiques</a>
+                    <a href="#infrastructure">Windows Server &amp; vidéosurveillance</a>
+                </nav>
+            </div>
+
+            <div>
+                <h4>Réalisations</h4>
+                <nav class="footer__links" aria-label="Réalisations">
+                    <a href="demo/finatrack.html">FinaTrack CI <svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
+                    <a href="demo/voxnote/">VoxNote <svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
+                    <a href="demo/splat-arena.html">Paintball 2D <svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
+                    <a href="demo/puzzle/">Puzzle Studio <svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
+                </nav>
+            </div>
+
+            <div>
+                <h4>Contact</h4>
+                <nav class="footer__links" aria-label="Contact">
+                    <a href="mailto:contact@techzen.ci"><svg aria-hidden="true"><use href="#i-mail"/></svg> contact@techzen.ci</a>
+                    <a href="#" data-wa="Bonjour TechZen !"><svg aria-hidden="true"><use href="#i-whatsapp"/></svg> WhatsApp</a>
+                    <a href="#contact"><svg aria-hidden="true"><use href="#i-pin"/></svg> Abidjan, Côte d'Ivoire</a>
+                    <a href="#contact"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg> Demander un devis</a>
+                </nav>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <span>© <span id="year">2026</span> TechZen <span class="dot">·</span> Tous droits réservés.</span>
+            <span>Création de sites · SEO · E-commerce · Data · Réseaux · Windows Server</span>
+        </div>
+    </div>
+</footer>
+
+<a class="wa-fab" href="#" data-wa="Bonjour TechZen, je souhaite discuter de mon projet." aria-label="Discuter sur WhatsApp">
+    <svg aria-hidden="true"><use href="#i-whatsapp"/></svg>
+    <span class="wa-fab__txt">Discutons</span>
+</a>
+
+
+<!-- ====================== VISIONNEUSE ====================== -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Visionneuse de visuels" hidden>
+    <div class="lightbox__bar">
+        <span class="lightbox__title" id="lbTitle"></span>
+        <button class="lightbox__close" id="lbClose" type="button" aria-label="Fermer">
+            <svg aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+    </div>
+    <div class="lightbox__stage"><img id="lbImg" src="" alt=""></div>
+    <div class="lightbox__nav">
+        <button type="button" id="lbPrev"><svg aria-hidden="true" style="transform:rotate(180deg)"><use href="#i-arrow-r"/></svg> Précédent</button>
+        <span class="sep" id="lbCount"></span>
+        <button type="button" id="lbNext">Suivant <svg aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
