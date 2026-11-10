@@ -1084,12 +1084,13 @@ html[data-theme="dark"] .svc__link { color: var(--brand-soft); }
 .projects {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.35rem;
+    gap: clamp(1.1rem, 2vw, 1.6rem);
 }
 
 .project {
     display: grid;
     grid-template-rows: auto 1fr;
+    align-content: start;
     border-radius: var(--radius-lg);
     border: 1px solid var(--line);
     background: var(--surface);
@@ -1102,30 +1103,20 @@ html[data-theme="dark"] .svc__link { color: var(--brand-soft); }
 
 .project.is-hidden { display: none; }
 
-.project--feature {
-    grid-column: span 2;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    grid-template-rows: 1fr;
-}
-
 .project__media {
     position: relative;
     overflow: hidden;
     background: var(--surface-2);
     aspect-ratio: 16 / 9;
     border-bottom: 1px solid var(--line);
+    flex: none;
 }
-
-.project--feature .project__media { aspect-ratio: auto; border-bottom: 0; border-right: 1px solid var(--line); min-height: 340px; }
-
-.project--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
-.project--flip .project__media { order: 2; border-right: 0; border-left: 1px solid var(--line); }
-.project--flip .project__body { order: 1; }
 
 .project__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform .85s var(--ease-out);
 }
 
@@ -1269,10 +1260,13 @@ html[data-theme="dark"] .svc__link { color: var(--brand-soft); }
 
 .project__body {
     padding: 1.35rem 1.4rem 1.4rem;
-    display: grid;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     gap: .7rem;
+    min-height: 0;
 }
+
+.project__body > p { flex: 1 1 auto; }
 
 .project__head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
 
@@ -1323,7 +1317,7 @@ html[data-theme="dark"] .project__badge { color: #63d99b; }
     display: flex;
     flex-wrap: wrap;
     gap: .5rem;
-    margin-top: .25rem;
+    margin-top: auto;
     padding-top: .85rem;
     border-top: 1px solid var(--line);
 }
@@ -1355,9 +1349,7 @@ html[data-theme="dark"] .project__badge { color: #63d99b; }
 
 @media (max-width: 900px) {
     .projects { grid-template-columns: 1fr; }
-    .project--feature { grid-column: span 1; grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-    .project--feature .project__media { border-right: 0; border-left: 0; border-bottom: 1px solid var(--line); min-height: 0; aspect-ratio: 16 / 9; }
-    .project--flip .project__media { order: 0; }
+
 }
 
 /* --------------------------------------------------------------------------
