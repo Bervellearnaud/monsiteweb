@@ -1155,30 +1155,31 @@ html[data-theme="dark"] .svc__link { color: var(--brand-soft); }
 .project__open svg { width: 15px; height: 15px; }
 
 .project__thumbs {
-    position: absolute;
-    left: 12px;
-    bottom: 12px;
     display: flex;
     gap: .4rem;
-    z-index: 3;
+    margin-top: .15rem;
 }
 
 .project__thumbs button {
-    width: 54px;
-    height: 36px;
+    width: 56px;
+    height: 34px;
     padding: 0;
-    border-radius: 8px;
+    border-radius: 7px;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, .85);
-    box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .8);
-    opacity: .78;
+    border: 1px solid var(--line-strong);
+    opacity: .72;
     transition: var(--t-fast);
-    background: #0b1e2c;
+    background: var(--surface-2);
+    flex: none;
 }
 
 .project__thumbs button img { width: 100%; height: 100%; object-fit: cover; }
 .project__thumbs button:hover { opacity: 1; transform: translateY(-2px); }
-.project__thumbs button.is-active { opacity: 1; border-color: #fff; box-shadow: 0 0 0 2px var(--brand-soft), 0 6px 14px -8px rgba(0, 0, 0, .8); }
+.project__thumbs button.is-active {
+    opacity: 1;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-tint);
+}
 
 .zoom-btn {
     position: absolute;
@@ -1266,7 +1267,14 @@ html[data-theme="dark"] .svc__link { color: var(--brand-soft); }
     min-height: 0;
 }
 
-.project__body > p { flex: 1 1 auto; }
+.project__body > p {
+    flex: 1 1 auto;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(5 * 1.65em);
+}
 
 .project__head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
 
@@ -1316,6 +1324,7 @@ html[data-theme="dark"] .project__badge { color: #63d99b; }
 .project__actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: .5rem;
     margin-top: auto;
     padding-top: .85rem;
