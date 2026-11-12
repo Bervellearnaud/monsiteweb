@@ -94,7 +94,7 @@ serveur web (Apache, Nginx). Pour GitHub Pages, publiez la racine du dépôt.
 | FinaTrack CI | Application de suivi budgétaire (PWA) | `demo/finatrack.html` | https://finnatrack.netlify.app |
 | VoxNote | Notes vocales & photos (PWA React) | `demo/voxnote/` | — |
 | Paintball 2D | Arcade canvas | `demo/splat-arena.html` | https://painballvoom.netlify.app |
-| Puzzle Studio | Jeu de puzzle hors-ligne | `demo/puzzle/` | — |
+| Puzzle Studio | Jeu de puzzle hors-ligne | `demo/puzzle/` | https://mypuzzle.netlify.app |
 
 > Les liens vers le code source et l'icône GitHub ont été retirés du site sur demande.
 
