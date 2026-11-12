@@ -37,8 +37,8 @@ demo/                    Démos réelles des projets, jouables dans le navigateu
 2. **Expertises** — sites web, référencement, e-commerce, analyse de données,
    réseaux informatiques, Windows Server & vidéosurveillance
 3. **Réalisations** — 4 projets réels dans une grille régulière 2 × 2
-   (cartes de hauteur égale, visuels au format 16/9), filtres, galeries,
-   visionneuse et liens directs vers les démos
+   (cartes de hauteur égale, visuels au format 16/9, sans libellé de catégorie),
+   filtres, galeries, visionneuse et liens directs vers les démos
 4. **Croissance / SEO** — visibilité, acquisition locale, conversion, SEO e-commerce
 5. **Méthode** — cadrage, conception, mise en ligne, mesure
 6. **Infrastructure** — amélioration d'un réseau existant, nouveau réseau,
