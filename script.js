@@ -313,13 +313,13 @@
     var lbIndex = 0;
     var lbReturnFocus = null;
 
-    function galleryOf(media) {
+    function galleryOf(card) {
         var items = [];
-        var main = $("img[data-main]", media);
+        var main = $("img[data-main]", card);
         if (main) {
             items.push({ src: main.getAttribute("src"), caption: main.getAttribute("alt") || "", alt: main.getAttribute("alt") || "" });
         }
-        $$(".project__thumbs button", media).forEach(function (btn) {
+        $$(".project__thumbs button", card).forEach(function (btn) {
             var img = $("img", btn);
             items.push({
                 src: btn.getAttribute("data-full") || (img ? img.getAttribute("src") : ""),
@@ -364,10 +364,12 @@
         if (lbReturnFocus && lbReturnFocus.focus) lbReturnFocus.focus();
     }
 
-    $$(".project__media").forEach(function (media) {
+    $$(".project").forEach(function (card) {
+        var media = $(".project__media", card);
+        if (!media) return;
         var main = $("img[data-main]", media);
-        var thumbs = $$(".project__thumbs button", media);
-        var items = galleryOf(media);
+        var thumbs = $$(".project__thumbs button", card);
+        var items = galleryOf(card);
 
         thumbs.forEach(function (btn, i) {
             btn.addEventListener("click", function (e) {
