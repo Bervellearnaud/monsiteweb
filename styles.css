@@ -733,6 +733,11 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .mock__main { padding: 1.05rem; display: grid; gap: .8rem; align-content: start; }
 
+/* Réserve l'espace de la carte flottante « Analyse de données » sous les lignes du tableau */
+@media (min-width: 621px) {
+    .mock__main { padding-bottom: 4.5rem; }
+}
+
 .mock__title { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
 .mock__title strong { font-size: .9rem; color: var(--ink); }
 .mock__title span {
