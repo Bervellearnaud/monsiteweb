@@ -2141,85 +2141,7 @@ html[data-theme="dark"] .sl-plan__list svg { color: #63d99b; }
 }
 
 /* --------------------------------------------------------------------------
-   12. Offres
-   -------------------------------------------------------------------------- */
-.offers {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.15rem;
-    align-items: start;
-}
-
-.offer {
-    position: relative;
-    display: grid;
-    align-content: start;
-    gap: .9rem;
-    padding: 1.7rem 1.5rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--line);
-    background: var(--surface);
-    box-shadow: var(--shadow-xs);
-    transition: var(--t);
-}
-
-.offer:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-
-.offer--feature {
-    background:
-        radial-gradient(90% 80% at 90% 0%, rgba(34, 195, 214, .30), transparent 62%),
-        linear-gradient(160deg, #0a2436, #0a1b2a);
-    border-color: rgba(255, 255, 255, .14);
-    box-shadow: var(--shadow-lg);
-    color: rgba(233, 245, 251, .82);
-}
-
-.offer--feature h3 { color: #fff; }
-.offer--feature .offer__label { color: rgba(233, 245, 251, .72); }
-.offer--feature .offer__list li { color: rgba(233, 245, 251, .84); }
-.offer--feature .offer__list li::before { background: radial-gradient(circle, #22c3d6 0 3px, transparent 3.5px), rgba(255, 255, 255, .12); }
-
-.offer__flag {
-    position: absolute;
-    top: -12px;
-    right: 1.35rem;
-    padding: .25rem .7rem;
-    border-radius: 999px;
-    background: var(--grad);
-    color: #fff;
-    font-size: .68rem;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    box-shadow: var(--shadow-brand);
-}
-
-.offer__label { font-size: .74rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--brand-strong); }
-html[data-theme="dark"] .offer__label { color: var(--brand-soft); }
-
-.offer h3 { font-size: 1.3rem; }
-.offer > p { font-size: .89rem; }
-
-.offer__list { list-style: none; padding: 0; display: grid; gap: .5rem; font-size: .88rem; }
-.offer__list li { display: flex; gap: .55rem; align-items: flex-start; }
-.offer__list li::before {
-    content: "";
-    flex: none;
-    width: 16px; height: 16px;
-    margin-top: .3rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--brand) 0 3px, transparent 3.5px), var(--brand-tint);
-}
-
-.offer .btn { margin-top: .4rem; }
-
-@media (max-width: 900px) {
-    .offers { grid-template-columns: 1fr; }
-    .offer--feature { order: -1; }
-}
-
-/* --------------------------------------------------------------------------
-   13. FAQ
+   12. FAQ
    -------------------------------------------------------------------------- */
 .faq { display: grid; gap: .65rem; max-width: 860px; margin-inline: auto; }
 
@@ -2265,7 +2187,7 @@ html[data-theme="dark"] .offer__label { color: var(--brand-soft); }
 .qa__body { padding: 0 1.25rem 1.2rem; font-size: .92rem; color: var(--text); max-width: 68ch; }
 
 /* --------------------------------------------------------------------------
-   14. Contact
+   13. Contact
    -------------------------------------------------------------------------- */
 .contact {
     position: relative;
@@ -2378,7 +2300,7 @@ html[data-theme="dark"] .method__ico { color: var(--brand-soft); }
 html[data-theme="dark"] .form__status { color: #63d99b; }
 
 /* --------------------------------------------------------------------------
-   15. Footer
+   14. Footer
    -------------------------------------------------------------------------- */
 .footer {
     border-top: 1px solid var(--line);
@@ -2446,7 +2368,7 @@ html[data-theme="dark"] .footer__links a:hover { color: var(--brand-soft); }
 .footer__bottom .dot { color: var(--brand); }
 
 /* --------------------------------------------------------------------------
-   16. Bouton flottant WhatsApp
+   15. Bouton flottant WhatsApp
    -------------------------------------------------------------------------- */
 .wa-fab {
     position: fixed;
@@ -2493,7 +2415,7 @@ html[data-theme="dark"] .footer__links a:hover { color: var(--brand-soft); }
 }
 
 /* --------------------------------------------------------------------------
-   17. Divers
+   16. Divers
    -------------------------------------------------------------------------- */
 .skip-link {
     position: absolute;

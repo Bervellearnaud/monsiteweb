@@ -47,8 +47,7 @@ demo/                    Démos réelles des projets, jouables dans le navigateu
    accès mobile sécurisé, caméras Wi-Fi / sites isolés, maintenance
 8. **Installation Starlink** — vérification du site, fixation et câblage, mise en
    service, réseau local et continuité (avec aperçu de liaison satellite)
-9. **Offres** — Présence / Croissance / E-commerce & IT
-10. **FAQ**, **Contact** (formulaire → WhatsApp) et pied de page
+9. **FAQ**, **Contact** (formulaire → WhatsApp) et pied de page
 
 ## Personnalisation rapide
 
@@ -68,7 +67,7 @@ var CONFIG = {
 * **E-mail** : remplacez `contact@techzen.ci` — adresse provisoire, également
   présente dans `index.html` (liens `mailto:`). ⏳ À renseigner.
 * **Couleurs** : variables `--brand`, `--brand-soft`, `--grad` dans `styles.css`.
-* **Textes / offres / FAQ** : directement dans `index.html`.
+* **Textes / FAQ** : directement dans `index.html`.
 
 ## Thème clair / sombre
 
