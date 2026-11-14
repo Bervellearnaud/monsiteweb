@@ -483,7 +483,7 @@
             ? window.matchMedia("(prefers-reduced-motion: reduce)")
             : { matches: false };
 
-        var SPEED = 42;          /* vitesse de croisière, en px/s */
+        var SPEED = 75;          /* vitesse de croisière, en px/s (≈ 1,8× l'ancienne valeur) */
         var HOVER_IDLE = 2200;   /* reprise 2,2 s après le dernier mouvement de souris */
         var FOCUS_IDLE = 5000;   /* reprise 5 s après la dernière touche de clavier */
         var ACTION_IDLE = 2500;  /* reprise 2,5 s après molette ou bouton */
