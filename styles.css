@@ -1536,24 +1536,78 @@ html[data-theme="dark"] .checks svg { color: #63d99b; }
     .checks--grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Bloc d'introduction posé dans la section vidéosurveillance */
-.checks__lead { margin-top: 2.2rem; }
-
-.checks__card--lead {
-    background: linear-gradient(180deg, var(--surface), var(--surface-2));
-    border-color: rgba(28, 134, 184, .22);
-    box-shadow: var(--shadow-sm);
+/* Bandeau de tête de la section vidéosurveillance */
+.vs-band {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 1.05rem 1.35rem;
+    margin-bottom: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+    background: linear-gradient(135deg, var(--surface), var(--surface-2));
+    box-shadow: var(--shadow-xs);
 }
 
-.checks__card--lead svg {
-    background: rgba(28, 134, 184, .14);
+.vs-band__ico {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    background: var(--grad-soft);
+    border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
     color: var(--brand-strong);
+}
+
+.vs-band__ico svg { width: 25px; height: 25px; }
+
+.vs-band__txt strong {
+    display: block;
+    font-size: 1.02rem;
+    color: var(--ink);
+    letter-spacing: -.01em;
+}
+
+.vs-band__txt p {
+    margin: .18rem 0 0;
+    font-size: .9rem;
+    line-height: 1.55;
+    color: var(--text);
+}
+
+.vs-band__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .62rem 1.05rem;
+    border-radius: 999px;
+    font-size: .87rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--brand-strong);
+    background: var(--bg-alt);
+    border: 1px solid color-mix(in srgb, var(--brand) 26%, var(--line));
+    transition: var(--t);
+}
+
+.vs-band__cta svg { width: 15px; height: 15px; }
+.vs-band__cta:hover { background: var(--brand); border-color: transparent; color: #fff; }
+
+@media (max-width: 860px) {
+    .vs-band {
+        grid-template-columns: auto minmax(0, 1fr);
+        padding: 1rem 1.1rem;
+        gap: .9rem;
+    }
+    .vs-band__cta { grid-column: 1 / -1; justify-content: center; }
 }
 
 @media (max-width: 760px) {
     .checks--grid { grid-template-columns: 1fr; gap: .8rem; margin-top: 1.7rem; }
     .checks--grid-3 { grid-template-columns: 1fr; }
-    .checks__lead { margin-top: 1.6rem; }
 }
 
 /* Panneau "analytics" */
@@ -1640,8 +1694,9 @@ html[data-theme="dark"] .panel__stat em { color: #63d99b; }
 
 .infra-card {
     position: relative;
-    display: grid;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     gap: .7rem;
     padding: 1.5rem 1.4rem;
     border-radius: var(--radius);
@@ -1672,15 +1727,17 @@ html[data-theme="dark"] .panel__stat em { color: #63d99b; }
 .infra-card > * { position: relative; z-index: 1; }
 
 .infra-card .svc__ico {
-    width: 46px;
-    height: 46px;
-    border-radius: 13px;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
 }
-
-.infra-card .svc__ico svg { width: 22px; height: 22px; }
+.infra-card .svc__ico svg { width: 24px; height: 24px; }
 .infra-card h3 { font-size: 1.06rem; }
 .infra-card p { font-size: .89rem; }
-.infra-card .svc__list { font-size: .82rem; }
+
+/* Les descriptions occupent la même hauteur : les listes s'alignent d'une carte à l'autre */
+.section--soft .infra-card p { min-height: calc(3 * 1.65em); }
+.infra-card .svc__list { font-size: .82rem; margin-top: auto; padding-top: .15rem; }
 
 @media (max-width: 980px) {
     .infra-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
