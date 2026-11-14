@@ -454,6 +454,140 @@
         });
     });
 
+    /* Bandeau des technos : défilement manuel (molette, drag, clavier, flèches) */
+    (function () {
+        var vp = $("[data-marquee]");
+        if (!vp) return;
+        var track = $(".marquee", vp);
+        var prev = $("[data-marquee-prev]");
+        var next = $("[data-marquee-next]");
+        var fadeL = $(".marquee__fade--l", vp);
+        var fadeR = $(".marquee__fade--r", vp);
+        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+        var paused = false;
+        var resumeTimer = null;
+
+        /* reprise de l'animation automatique après un temps de latence */
+        function resume(delay) {
+            window.clearTimeout(resumeTimer);
+            resumeTimer = window.setTimeout(function () { paused = false; }, delay);
+        }
+
+        /* défilement continu, interrompu dès que l'utilisateur prend la main */
+        var looping = false;
+
+        function loop() {
+            if (looping) return;
+            looping = true;
+            tick();
+        }
+
+        function tick() {
+            if (!paused && !reduce.matches) {
+                if (vp.scrollLeft + vp.clientWidth >= vp.scrollWidth - 1) {
+                    vp.scrollLeft = 0;
+                } else {
+                    vp.scrollLeft += 0.55;
+                }
+            }
+            window.requestAnimationFrame(tick);
+        }
+
+        function step() {
+            var item = $(".marquee__item", track);
+            var gap = parseFloat(getComputedStyle(track).getPropertyValue("gap")) || 24;
+            return item ? item.getBoundingClientRect().width + gap : 160;
+        }
+
+        function sync() {
+            var max = vp.scrollWidth - vp.clientWidth;
+            if (prev) prev.disabled = vp.scrollLeft <= 4;
+            if (next) next.disabled = vp.scrollLeft >= max - 4;
+            if (fadeL) fadeL.style.opacity = vp.scrollLeft <= 4 ? "0" : "1";
+            if (fadeR) fadeR.style.opacity = vp.scrollLeft >= max - 4 ? "0" : "1";
+        }
+
+        vp.addEventListener("scroll", sync, { passive: true });
+        window.addEventListener("resize", sync);
+        sync();
+
+        /* pause de l'animation automatique au survol / au toucher / au clavier */
+        vp.addEventListener("pointerenter", function () { paused = true; });
+        vp.addEventListener("pointerleave", function () { window.clearTimeout(resumeTimer); paused = false; });
+        vp.addEventListener("focusin", function () { paused = true; });
+        vp.addEventListener("focusout", function () { paused = false; });
+        vp.addEventListener("pointerdown", function () { paused = true; });
+        vp.addEventListener("pointerup", function () { resume(5000); });
+
+        function scrollByStep(dir) {
+            paused = true;
+            vp.scrollBy({ left: dir * step() * 1.6, behavior: reduce.matches ? "auto" : "smooth" });
+            resume(5000);
+        }
+
+        if (prev) prev.addEventListener("click", function () { scrollByStep(-1); });
+        if (next) next.addEventListener("click", function () { scrollByStep(1); });
+
+        /* molette verticale → défilement horizontal du bandeau */
+        vp.addEventListener("wheel", function (e) {
+            if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+            var max = vp.scrollWidth - vp.clientWidth;
+            if (max <= 0) return;
+            var target = vp.scrollLeft + e.deltaY;
+            if ((target <= 0 && e.deltaY < 0) || (target >= max && e.deltaY > 0)) return;
+            e.preventDefault();
+            paused = true;
+            vp.scrollLeft = target;
+        }, { passive: false });
+
+        /* glisser à la souris */
+        var dragging = false, startX = 0, startScroll = 0;
+        vp.addEventListener("pointerdown", function (e) {
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            dragging = true;
+            startX = e.clientX;
+            startScroll = vp.scrollLeft;
+            vp.classList.add("is-dragging");
+        });
+        vp.addEventListener("pointermove", function (e) {
+            if (!dragging) return;
+            var dx = e.clientX - startX;
+            if (Math.abs(dx) > 3) vp.setPointerCapture && vp.setPointerCapture(e.pointerId);
+            vp.scrollLeft = startScroll - dx;
+        });
+        ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+            vp.addEventListener(ev, function () {
+                dragging = false;
+                vp.classList.remove("is-dragging");
+            });
+        });
+
+        /* clavier : le viewport est focusable (la piste est décorative) */
+        function jumpTo(left) {
+            paused = true;
+            vp.scrollTo({ left: left, behavior: "smooth" });
+            resume(5000);
+        }
+
+        vp.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowRight") { e.preventDefault(); scrollByStep(1); }
+            if (e.key === "ArrowLeft") { e.preventDefault(); scrollByStep(-1); }
+            if (e.key === "Home") { e.preventDefault(); jumpTo(0); }
+            if (e.key === "End") { e.preventDefault(); jumpTo(vp.scrollWidth); }
+        });
+
+        /* ne pas laisser le bandeau tourner inutilement hors écran */
+        if ("IntersectionObserver" in window) {
+            new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) window.requestAnimationFrame(loop);
+                });
+            }, { threshold: 0 }).observe(vp);
+        } else {
+            window.requestAnimationFrame(loop);
+        }
+    })();
+
     /* Défilement doux pour les ancres (compatibilité navigateurs anciens) */
     $$('a[href^="#"]').forEach(function (link) {
         link.addEventListener("click", function (e) {
