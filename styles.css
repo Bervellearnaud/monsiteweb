@@ -832,10 +832,11 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .float-card--seo { top: -22px; left: -26px; animation-delay: -1.2s; }
 .float-card--seo .float-card__ico { background: rgba(31, 170, 89, .14); color: #1faa59; }
 .float-card--net { bottom: 48px; right: -30px; animation-delay: -3.4s; }
-.float-card--data { bottom: -22px; left: 22%; animation-delay: -2.1s; }
+.float-card--data { bottom: -22px; left: -26px; animation-delay: -2.1s; }
 
 @media (max-width: 1080px) {
     .float-card--seo { left: 0; }
+    .float-card--data { left: 0; }
     .float-card--net { right: 0; }
 }
 
