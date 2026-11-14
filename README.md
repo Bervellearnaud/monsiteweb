@@ -54,8 +54,10 @@ offre, réassurance, action.
 1. **Hero (`#accueil`)** — proposition de valeur, CTA, preuves rapides, maquette
    d'interface animée et rangée de trois cartes de synthèse alignées sous la
    maquette (aucune superposition).
-2. **Bandeau technos** — « Les briques que nous maîtrisons » : bandeau défilant
-   automatiquement et contrôlable manuellement (boutons, molette, glisser, clavier).
+2. **Carrousel technos** — « Les briques que nous maîtrisons » : 11 cartes en
+   défilement horizontal visible, avec boutons précédent/suivant, compteur
+   « 4–6 / 11 », barre de progression, molette, glisser à la souris, balayage
+   tactile et navigation clavier (aucun défilement automatique).
 3. **Expertises (`#services`)** — web, SEO, e-commerce, data, réseaux et serveurs.
 4. **Réalisations (`#realisations`)** — projets réels en grille 2 × 2 sur desktop,
    avec filtres, galeries d'images, visionneuse et liens vers les démos.
@@ -86,7 +88,7 @@ offre, réassurance, action.
 | Révélations | Animation d'apparition via `IntersectionObserver` |
 | Compteurs | Chiffres du bandeau KPI animés à l'arrivée dans le viewport |
 | Projets | Filtres Web / Applications / Jeux, vignettes, lightbox clavier et tactile |
-| Bandeau technos | Défilement continu, pause au survol / focus / interaction |
+| Carrousel technos | Défilement horizontal manuel, alignement par carte (`scroll-snap`), compteur et barre de progression |
 | FAQ | Accordéon natif (`details` / `summary`), une réponse ouverte à la fois |
 | Formulaire | Validation navigateur, ouverture d'un message WhatsApp pré-rempli |
 | WhatsApp | Tous les CTA basculent vers un e-mail pré-rempli tant que `WHATSAPP_NUMBER` est vide |

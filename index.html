@@ -230,49 +230,77 @@
     <div class="wrap stack-strip__head">
         <p class="stack-strip__label">Les briques que nous maîtrisons</p>
         <div class="stack-strip__nav">
-            <button class="marquee__nav" type="button" data-marquee-prev aria-label="Faire défiler vers la gauche">
+            <span class="carousel__count" data-carousel-count aria-live="polite">1–3 / 11</span>
+            <button class="carousel__nav" type="button" data-carousel-prev aria-label="Faire défiler vers la gauche">
                 <svg aria-hidden="true"><use href="#i-arrow-l"/></svg>
             </button>
-            <button class="marquee__nav" type="button" data-marquee-next aria-label="Faire défiler vers la droite">
+            <button class="carousel__nav" type="button" data-carousel-next aria-label="Faire défiler vers la droite">
                 <svg aria-hidden="true"><use href="#i-arrow-r"/></svg>
             </button>
         </div>
     </div>
-    <div class="stack-strip__viewport" data-marquee tabindex="0" role="group" aria-roledescription="carrousel"
-         aria-label="Technologies et expertises — liste qui défile automatiquement, mise en pause au survol et à la prise de focus ; boutons ou flèches du clavier pour avancer">
-        <div class="marquee__window">
-            <div class="marquee">
-                <div class="marquee__group">
-                    <span class="marquee__item"><svg><use href="#i-code"/></svg> React &amp; Vite</span>
-                    <span class="marquee__item"><svg><use href="#i-globe"/></svg> HTML / CSS / JavaScript</span>
-                    <span class="marquee__item"><svg><use href="#i-db"/></svg> Supabase &amp; PostgreSQL</span>
-                    <span class="marquee__item"><svg><use href="#i-chart"/></svg> Analyse de données</span>
-                    <span class="marquee__item"><svg><use href="#i-search"/></svg> SEO technique</span>
-                    <span class="marquee__item"><svg><use href="#i-cart"/></svg> E-commerce</span>
-                    <span class="marquee__item"><svg><use href="#i-server"/></svg> Windows Server</span>
-                    <span class="marquee__item"><svg><use href="#i-network"/></svg> Réseaux &amp; Wi-Fi</span>
-                    <span class="marquee__item"><svg><use href="#i-camera"/></svg> Vidéosurveillance IP</span>
-                    <span class="marquee__item"><svg><use href="#i-dish"/></svg> Installation Starlink</span>
-                    <span class="marquee__item"><svg><use href="#i-router"/></svg> Wi-Fi &amp; PoE</span>
-                </div>
-                <div class="marquee__group">
-                    <span class="marquee__item"><svg><use href="#i-code"/></svg> React &amp; Vite</span>
-                    <span class="marquee__item"><svg><use href="#i-globe"/></svg> HTML / CSS / JavaScript</span>
-                    <span class="marquee__item"><svg><use href="#i-db"/></svg> Supabase &amp; PostgreSQL</span>
-                    <span class="marquee__item"><svg><use href="#i-chart"/></svg> Analyse de données</span>
-                    <span class="marquee__item"><svg><use href="#i-search"/></svg> SEO technique</span>
-                    <span class="marquee__item"><svg><use href="#i-cart"/></svg> E-commerce</span>
-                    <span class="marquee__item"><svg><use href="#i-server"/></svg> Windows Server</span>
-                    <span class="marquee__item"><svg><use href="#i-network"/></svg> Réseaux &amp; Wi-Fi</span>
-                    <span class="marquee__item"><svg><use href="#i-camera"/></svg> Vidéosurveillance IP</span>
-                    <span class="marquee__item"><svg><use href="#i-dish"/></svg> Installation Starlink</span>
-                    <span class="marquee__item"><svg><use href="#i-router"/></svg> Wi-Fi &amp; PoE</span>
-                </div>
-            </div>
+
+    <div class="stack-strip__viewport">
+        <div class="tech-track" data-carousel tabindex="0" role="group" aria-roledescription="carrousel"
+             aria-label="Technologies et expertises — carrousel : utilisez les flèches du clavier, les boutons, la molette ou le glisser pour faire défiler">
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-code"/></svg></span>
+                <span class="tech-card__cat">Développement</span>
+                <strong class="tech-card__name">React &amp; Vite</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-globe"/></svg></span>
+                <span class="tech-card__cat">Développement</span>
+                <strong class="tech-card__name">HTML / CSS / JavaScript</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-db"/></svg></span>
+                <span class="tech-card__cat">Données</span>
+                <strong class="tech-card__name">Supabase &amp; PostgreSQL</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-chart"/></svg></span>
+                <span class="tech-card__cat">Données</span>
+                <strong class="tech-card__name">Analyse de données</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-search"/></svg></span>
+                <span class="tech-card__cat">Acquisition</span>
+                <strong class="tech-card__name">SEO technique</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-cart"/></svg></span>
+                <span class="tech-card__cat">Acquisition</span>
+                <strong class="tech-card__name">E-commerce</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-server"/></svg></span>
+                <span class="tech-card__cat">Infrastructure</span>
+                <strong class="tech-card__name">Windows Server</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-network"/></svg></span>
+                <span class="tech-card__cat">Infrastructure</span>
+                <strong class="tech-card__name">Réseaux &amp; Wi-Fi</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-camera"/></svg></span>
+                <span class="tech-card__cat">Infrastructure</span>
+                <strong class="tech-card__name">Vidéosurveillance IP</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-dish"/></svg></span>
+                <span class="tech-card__cat">Infrastructure</span>
+                <strong class="tech-card__name">Installation Starlink</strong>
+            </article>
+            <article class="tech-card" role="group" aria-roledescription="élément de carrousel">
+                <span class="tech-card__ico"><svg aria-hidden="true"><use href="#i-router"/></svg></span>
+                <span class="tech-card__cat">Infrastructure</span>
+                <strong class="tech-card__name">Wi-Fi &amp; PoE</strong>
+            </article>
         </div>
-        <div class="marquee__fade marquee__fade--l"></div>
-        <div class="marquee__fade marquee__fade--r"></div>
     </div>
+    <div class="tech-scrollbar" aria-hidden="true"><i data-carousel-progress></i></div>
 </section>
 
 <!-- ====================== SERVICES ====================== -->
@@ -947,7 +975,7 @@
                         <small>Service à partir de</small>
                         <strong>28 746 <span>F CFA</span><em>/mois</em></strong>
                     </div>
-                </article>
+            </article>
 
                 <article class="sl-plan sl-plan--top">
                     <span class="sl-plan__flag">Le plus rapide</span>
@@ -961,7 +989,7 @@
                         <small>Service à partir de</small>
                         <strong>40 244 <span>F CFA</span><em>/mois</em></strong>
                     </div>
-                </article>
+            </article>
             </div>
 
             <p class="sl-plans__note">

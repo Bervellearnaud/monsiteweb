@@ -454,222 +454,188 @@
         });
     });
 
-    /* Bandeau des technos : défilement automatique continu.
-       Le contenu est dupliqué : on boucle après la largeur d'un groupe, ce qui
-       rend la boucle invisible.
-
-       Choix techniques (chacun corrige un défaut constaté) :
-       1. La piste est translatée en `transform`, pas en `scrollLeft` : le
-          mouvement est composité et fluide, sans ascenseur ni saut d'un pas à
-          l'autre (l'ancienne version avançait de 6,5 px toutes les 100 ms, soit
-          10 images/s : un à-coup visible, et un ascenseur qui apparaissait).
-       2. Toute pause est TEMPORAIRE. Un survol ou un focus ne doit jamais figer
-          le bandeau : le curseur traîne souvent au-dessus sans que l'on veuille
-          l'arrêter, et l'ancien code ne reprenait qu'au `pointerleave` — donc
-          jamais si la souris restait posée. La reprise est minutée.
-       3. Déplacement calculé avec un delta de temps (px/s), donc identique à
-          60, 90 ou 120 Hz, et sans saut au retour d'onglet. */
+    /* Carrousel des technos : défilement horizontal maîtrisé.
+       Le défilement est natif (scroll-snap) : molette, trackpad, balayage
+       tactile et clavier fonctionnent sans code. Le JS ajoute ce que le
+       natif ne donne pas : boutons précédent/suivant, compteur « 3 / 11 »,
+       barre de progression, glisser à la souris et alignement carte par carte.
+       Aucun défilement automatique : l'utilisateur garde le contrôle. */
     (function () {
-        var vp = $("[data-marquee]");
-        if (!vp) return;
-        var track = $(".marquee", vp);
+        var track = $("[data-carousel]");
         if (!track) return;
 
-        var prev = $("[data-marquee-prev]");
-        var next = $("[data-marquee-next]");
-        var fadeL = $(".marquee__fade--l", vp);
-        var fadeR = $(".marquee__fade--r", vp);
+        var prev = $("[data-carousel-prev]");
+        var next = $("[data-carousel-next]");
+        var counter = $("[data-carousel-count]");
+        var progress = $("[data-carousel-progress]");
+        var cards = $$(".tech-card", track);
         var reduce = window.matchMedia
             ? window.matchMedia("(prefers-reduced-motion: reduce)")
             : { matches: false };
 
-        var SPEED = 75;          /* vitesse de croisière, en px/s (≈ 1,8× l'ancienne valeur) */
-        var HOVER_IDLE = 2200;   /* reprise 2,2 s après le dernier mouvement de souris */
-        var FOCUS_IDLE = 5000;   /* reprise 5 s après la dernière touche de clavier */
-        var ACTION_IDLE = 2500;  /* reprise 2,5 s après molette ou bouton */
+        function maxScroll() { return Math.max(0, track.scrollWidth - track.clientWidth); }
 
-        var offset = 0;          /* décalage courant de la piste, en px */
-        var span = 0;            /* largeur d'un groupe = distance de bouclage */
-        var pausedUntil = 0;     /* horodatage de fin de pause */
-        var dragging = false;
-        var inView = true;
-        var lastFrame = 0;
-
-        function groups() { return $$(".marquee__group", track); }
-
-        /* Deux copies suffisent en général ; sur très grand écran elles ne
-           remplissent pas la fenêtre et la boucle laisserait un trou. On ajoute
-           des copies jusqu'à couvrir la largeur visible. */
-        function ensureCopies() {
-            var gs = groups();
-            if (!gs.length) return;
-            var groupW = gs[0].getBoundingClientRect().width;
-            if (!groupW) return;
-            var needed = Math.min(8, Math.max(2, Math.ceil((vp.clientWidth + groupW) / groupW)));
-            while (groups().length < needed) track.appendChild(gs[0].cloneNode(true));
+        /* Largeur d'une carte + gouttière = pas d'avance d'un cran */
+        function stride() {
+            if (cards.length < 2) return track.clientWidth;
+            return cards[1].offsetLeft - cards[0].offsetLeft;
         }
 
-        function measure() {
-            ensureCopies();
-            var gs = groups();
-            if (gs.length >= 2) {
-                span = gs[1].offsetLeft - gs[0].offsetLeft;
+        /* Position de défilement qui amène la carte i au bord gauche utile */
+        function leftOf(i) {
+            var card = cards[i];
+            if (!card) return 0;
+            var pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+            return Math.max(0, card.offsetLeft - track.offsetLeft - pad);
+        }
+
+        /* Aligne la piste sur la carte la plus proche de la position voulue */
+        function nearestIndex() {
+            if (!cards.length) return 0;
+            var best = 0, bestDist = Infinity;
+            var x = track.scrollLeft;
+            for (var i = 0; i < cards.length; i++) {
+                var d = Math.abs(leftOf(i) - x);
+                if (d < bestDist) { bestDist = d; best = i; }
             }
-            if (!span) span = track.scrollWidth / Math.max(1, gs.length);
-            if (span < 0) span = 0;
-            if (span > 0) offset = ((offset % span) + span) % span;
-            apply();
+            return best;
         }
 
-        function apply() {
-            track.style.transform = "translate3d(" + (-offset).toFixed(2) + "px, 0, 0)";
+        function goToIndex(i, smooth) {
+            i = Math.max(0, Math.min(cards.length - 1, i));
+            if (!cards[i]) return;
+            track.scrollTo({
+                left: leftOf(i),
+                behavior: (smooth && !reduce.matches) ? "smooth" : "auto"
+            });
+            /* certains navigateurs n'émettent pas `scroll` pour un scrollTo
+               instantané : on rafraîchit l'état sans attendre l'événement */
+            update();
         }
 
-        function isScrollable() { return span > 8; }
-
-        function sync() {
-            var on = isScrollable();
-            if (prev) prev.disabled = !on;
-            if (next) next.disabled = !on;
-            if (fadeL) fadeL.style.opacity = on ? "1" : "0";
-            if (fadeR) fadeR.style.opacity = on ? "1" : "0";
+        function step(dir) {
+            goToIndex(nearestIndex() + dir * Math.max(1, Math.round(visibleCount())), true);
         }
 
-        function pause(ms) {
-            pausedUntil = Math.max(pausedUntil, Date.now() + ms);
+        /* Nombre de cartes entièrement visibles : sert au saut de page et au compteur */
+        function visibleCount() {
+            var w = track.clientWidth;
+            var st = stride();
+            return st > 0 ? Math.max(1, Math.floor(w / st)) : 1;
         }
 
-        function isPaused() {
-            /* le survol et le focus ne figent que temporairement : sans limite
-               de temps, un curseur immobile arrêtait le bandeau pour de bon */
-            return dragging || Date.now() < pausedUntil;
+        function update() {
+            var max = maxScroll();
+            var x = track.scrollLeft;
+            var atStart = x <= 2;
+            var atEnd = x >= max - 2;
+
+            if (prev) prev.disabled = atStart;
+            if (next) next.disabled = atEnd || max <= 2;
+
+            /* Barre de progression : le curseur a la largeur de la part visible et
+               se déplace de 0 à « 100 % – largeur » du rail. */
+            if (progress) {
+                var ratio = max > 0 ? Math.min(1, Math.max(0, x / max)) : 0;
+                var visible = track.scrollWidth > 0
+                    ? Math.min(1, track.clientWidth / track.scrollWidth)
+                    : 1;
+                var widthPct = Math.max(9, visible * 100);   /* jamais plus fin qu'une poignée */
+                progress.style.width = widthPct + "%";
+                /* translation exprimée en % de la largeur du curseur */
+                progress.style.transform = "translateX(" +
+                    (max > 0 ? ratio * ((100 - widthPct) / widthPct) * 100 : 0).toFixed(2) + "%)";
+            }
+
+            /* Compteur : cartes visibles / total */
+            if (counter) {
+                var first = nearestIndex() + 1;
+                var shown = Math.min(cards.length, first + visibleCount() - 1);
+                counter.textContent = (cards.length ? (first === shown ? first : first + "–" + shown) : 0) +
+                    " / " + cards.length;
+            }
         }
 
-        function step() {
-            var item = $(".marquee__item", track);
-            var gap = parseFloat(getComputedStyle(track).getPropertyValue("gap")) || 24;
-            return item ? item.getBoundingClientRect().width + gap : 160;
-        }
+        var ticking = false;
+        track.addEventListener("scroll", function () {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(function () { update(); ticking = false; });
+        }, { passive: true });
 
-        function nudge(dir) {
-            /* déplacement manuel : on avance dans le même espace de bouclage */
-            pause(ACTION_IDLE);
-            if (!span) return;
-            var delta = dir * step() * 1.6;
-            offset = ((offset + delta) % span + span) % span;
-            track.style.transition = reduce.matches ? "none" : "transform .45s cubic-bezier(.22,.61,.36,1)";
-            apply();
-            window.setTimeout(function () { track.style.transition = ""; }, 460);
-        }
+        if (prev) prev.addEventListener("click", function () { step(-1); });
+        if (next) next.addEventListener("click", function () { step(1); });
 
-        vp.addEventListener("scroll", sync, { passive: true });
-        window.addEventListener("resize", function () { measure(); sync(); });
-        window.addEventListener("load", function () { measure(); sync(); });
-        if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(function () { measure(); sync(); });
-        }
-
-        /* --- Survol : pause pendant le mouvement, puis reprise automatique --- */
-        function hoverActivity(e) {
-            if (e && e.pointerType && e.pointerType !== "mouse") return;
-            pause(HOVER_IDLE);      /* pause glissante : chaque mouvement la repousse */
-        }
-        vp.addEventListener("pointerenter", hoverActivity);
-        vp.addEventListener("pointermove", hoverActivity);
-        vp.addEventListener("pointerleave", function () {
-            /* on repart vite : le survol n'est qu'une pause de confort */
-            pausedUntil = Math.min(pausedUntil, Date.now() + 400);
+        /* Clavier : flèches, Début, Fin, Page précédente/suivante */
+        track.addEventListener("keydown", function (e) {
+            var k = e.key;
+            if (k === "ArrowRight" || k === "ArrowLeft") {
+                e.preventDefault();
+                goToIndex(nearestIndex() + (k === "ArrowRight" ? 1 : -1), true);
+            } else if (k === "Home") {
+                e.preventDefault(); goToIndex(0, true);
+            } else if (k === "End") {
+                e.preventDefault(); goToIndex(cards.length - 1, true);
+            } else if (k === "PageDown") {
+                e.preventDefault(); step(1);
+            } else if (k === "PageUp") {
+                e.preventDefault(); step(-1);
+            }
         });
 
-        /* --- Clavier : pause pendant la navigation, reprise après inactivité --- */
-        vp.addEventListener("focusin", function () { pause(FOCUS_IDLE); });
-        vp.addEventListener("focusout", function () { pausedUntil = Math.min(pausedUntil, Date.now() + 400); });
-        vp.addEventListener("keydown", function (e) {
-            if (e.key === "ArrowRight") { e.preventDefault(); nudge(1); }
-            if (e.key === "ArrowLeft") { e.preventDefault(); nudge(-1); }
-            if (e.key === "Home") { e.preventDefault(); pause(ACTION_IDLE); offset = 0; apply(); }
-            if (e.key === "End") { e.preventDefault(); pause(ACTION_IDLE); offset = span - 1; apply(); }
-        });
-
-        if (prev) prev.addEventListener("click", function () { nudge(-1); });
-        if (next) next.addEventListener("click", function () { nudge(1); });
-
-        /* --- Molette verticale → défilement horizontal --- */
-        vp.addEventListener("wheel", function (e) {
+        /* Molette verticale → défilement horizontal, uniquement si le carrousel
+           peut encore avancer : sinon la page reprend la main. */
+        track.addEventListener("wheel", function (e) {
             if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-            if (!span) return;
-            var delta = e.deltaY;
-            /* on n'intercepte que si l'on peut encore bouger : sinon la page
-               reprend la main, mais le bandeau ne se fige pas */
+            var max = maxScroll();
+            if (max <= 2) return;
+            var goingRight = e.deltaY > 0;
+            if ((!goingRight && track.scrollLeft <= 0) || (goingRight && track.scrollLeft >= max)) return;
             e.preventDefault();
-            offset = ((offset + delta) % span + span) % span;
-            pause(ACTION_IDLE);
-            apply();
+            track.scrollLeft = Math.max(0, Math.min(max, track.scrollLeft + e.deltaY));
+            update();
         }, { passive: false });
 
-        /* --- Glisser à la souris / au doigt --- */
-        var startX = 0, startOffset = 0, dragMoved = false;
-        vp.addEventListener("pointerdown", function (e) {
-            if (e.pointerType === "mouse" && e.button !== 0) return;
-            dragging = true;
-            dragMoved = false;
-            startX = e.clientX;
-            startOffset = offset;
-            vp.classList.add("is-dragging");
+        /* Glisser à la souris (le tactile est déjà géré nativement) */
+        var dragging = false, moved = false, startX = 0, startLeft = 0;
+        track.addEventListener("pointerdown", function (e) {
+            if (e.pointerType !== "mouse" || e.button !== 0) return;
+            dragging = true; moved = false;
+            startX = e.clientX; startLeft = track.scrollLeft;
         });
-        vp.addEventListener("pointermove", function (e) {
+        track.addEventListener("pointermove", function (e) {
             if (!dragging) return;
             var dx = e.clientX - startX;
-            if (Math.abs(dx) > 3) {
-                dragMoved = true;
-                vp.setPointerCapture && vp.setPointerCapture(e.pointerId);
+            if (!moved && Math.abs(dx) > 4) {
+                moved = true;
+                track.classList.add("is-dragging");
+                track.setPointerCapture && track.setPointerCapture(e.pointerId);
             }
-            if (!dragMoved || !span) return;
-            var next = startOffset - dx;
-            offset = ((next % span) + span) % span;
-            apply();
+            if (moved) track.scrollLeft = startLeft - dx;
         });
         function endDrag() {
             if (!dragging) return;
             dragging = false;
-            vp.classList.remove("is-dragging");
-            pause(1500);
+            if (moved) {
+                track.classList.remove("is-dragging");
+                goToIndex(nearestIndex(), true);
+            }
+            update();
+            moved = false;
         }
         ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
-            vp.addEventListener(ev, endDrag);
+            track.addEventListener(ev, endDrag);
         });
 
-        /* --- Boucle d'animation : vitesse constante en px/s --- */
-        function frame(ts) {
-            window.requestAnimationFrame(frame);
-            var dt = lastFrame ? (ts - lastFrame) / 1000 : 0;
-            lastFrame = ts;
-            if (dt <= 0) return;
-            if (dt > 0.1) dt = 0.1;    /* retour d'onglet : ne pas rattraper d'un coup */
-
-            if (!span || reduce.matches || document.hidden || !inView || isPaused()) return;
-
-            offset += SPEED * dt;
-            if (offset >= span) offset -= span * Math.floor(offset / span);
-            apply();
-        }
-        window.requestAnimationFrame(frame);
-
-        /* Les copies ajoutées changent la largeur : on remesure pour rester juste */
+        /* Redimensionnement / chargement des polices : la géométrie change */
+        window.addEventListener("resize", update);
+        window.addEventListener("load", update);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(update);
         if ("ResizeObserver" in window) {
-            var ro = new ResizeObserver(function () { measure(); sync(); });
-            ro.observe(track);
+            new ResizeObserver(update).observe(track);
         }
 
-        /* Ne pas animer un bandeau hors écran */
-        if ("IntersectionObserver" in window) {
-            new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) { inView = entry.isIntersecting; });
-            }, { threshold: 0 }).observe(vp);
-        }
-
-        measure();
-        sync();
+        update();
     })();
 
     /* Défilement doux pour les ancres (compatibilité navigateurs anciens) */
