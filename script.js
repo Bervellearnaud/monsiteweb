@@ -480,8 +480,8 @@
             ? window.matchMedia("(prefers-reduced-motion: reduce)")
             : { matches: false };
 
-        var DELAY = 3200;        /* temps d'arrêt sur chaque page, en ms */
-        var IDLE_RESUME = 4000;  /* reprise 4 s après la dernière interaction */
+        var DELAY = 800;         /* temps d'arrêt sur chaque carte, en ms */
+        var IDLE_RESUME = 2600;  /* reprise après la dernière interaction */
         var userPaused = false;  /* pause explicite (bouton) ou reduce-motion */
         var inView = true;       /* la section est visible à l'écran */
         var hovering = false;    /* le curseur est sur le carrousel */
