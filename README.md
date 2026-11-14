@@ -168,7 +168,7 @@ Pensez à servir `index.html`, `styles.css`, `script.js`, `manifest.webmanifest`
 | Projet | Type | Démo locale | En ligne |
 | --- | --- | --- | --- |
 | FinaTrack CI | Application de pilotage budgétaire (PWA) | `demo/finatrack.html` | https://finnatrack.netlify.app |
-| VoxNote | Notes vocales et photos (PWA) | `demo/voxnote/` | — |
+| VoxNote | Notes vocales et photos (PWA) | `demo/voxnote/` | https://voxxnote.netlify.app/ |
 | Paintball 2D | Arène arcade canvas | `demo/splat-arena.html` | https://painballvoom.netlify.app |
 | Puzzle Studio | Puzzle hors-ligne | `demo/puzzle/` | https://mypuzzle.netlify.app |
 
