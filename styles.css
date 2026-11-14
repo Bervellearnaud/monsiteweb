@@ -894,7 +894,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 }
 
 
-/* Bandeau défilable : la piste est un conteneur scrollable (molette, drag, clavier, flèches) */
+/* Bandeau : défilement automatique en continu (boucle infinie, invisible du fait du contenu dupliqué) */
 .stack-strip__viewport {
     position: relative;
     overflow-x: auto;
