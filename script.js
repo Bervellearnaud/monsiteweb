@@ -454,50 +454,95 @@
         });
     });
 
-    /* Bandeau des technos : défilement automatique en continu.
-       Le contenu est dupliqué ×2 : on boucle après la largeur d'un groupe,
-       ce qui rend la boucle invisible. Le défilement se met en pause au
-       survol, au focus ou pendant une interaction, puis reprend tout seul. */
+    /* Bandeau des technos : défilement automatique continu.
+       Le contenu est dupliqué : on boucle après la largeur d'un groupe, ce qui
+       rend la boucle invisible.
+
+       Choix techniques (chacun corrige un défaut constaté) :
+       1. La piste est translatée en `transform`, pas en `scrollLeft` : le
+          mouvement est composité et fluide, sans ascenseur ni saut d'un pas à
+          l'autre (l'ancienne version avançait de 6,5 px toutes les 100 ms, soit
+          10 images/s : un à-coup visible, et un ascenseur qui apparaissait).
+       2. Toute pause est TEMPORAIRE. Un survol ou un focus ne doit jamais figer
+          le bandeau : le curseur traîne souvent au-dessus sans que l'on veuille
+          l'arrêter, et l'ancien code ne reprenait qu'au `pointerleave` — donc
+          jamais si la souris restait posée. La reprise est minutée.
+       3. Déplacement calculé avec un delta de temps (px/s), donc identique à
+          60, 90 ou 120 Hz, et sans saut au retour d'onglet. */
     (function () {
         var vp = $("[data-marquee]");
         if (!vp) return;
         var track = $(".marquee", vp);
+        if (!track) return;
+
         var prev = $("[data-marquee-prev]");
         var next = $("[data-marquee-next]");
         var fadeL = $(".marquee__fade--l", vp);
         var fadeR = $(".marquee__fade--r", vp);
-        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-        var STEP = 6.5;           /* pixels par pas : 65 px/s avec un intervalle de 0,10 s */
-        var paused = false;
-        var inView = true; /* défilement actif par défaut ; l'observateur met en pause hors écran quand il fonctionne */
-        var resumeTimer = null;
-        var acc = vp.scrollLeft || 0; /* position flottante : accumule les sous-pixels (Safari tronque scrollLeft) */
-        var span = 0;                 /* distance après laquelle on boucle */
+        var reduce = window.matchMedia
+            ? window.matchMedia("(prefers-reduced-motion: reduce)")
+            : { matches: false };
 
-        /* largeur d'un groupe : le contenu étant dupliqué, boucler à cette distance est invisible */
+        var SPEED = 42;          /* vitesse de croisière, en px/s */
+        var HOVER_IDLE = 2200;   /* reprise 2,2 s après le dernier mouvement de souris */
+        var FOCUS_IDLE = 5000;   /* reprise 5 s après la dernière touche de clavier */
+        var ACTION_IDLE = 2500;  /* reprise 2,5 s après molette ou bouton */
+
+        var offset = 0;          /* décalage courant de la piste, en px */
+        var span = 0;            /* largeur d'un groupe = distance de bouclage */
+        var pausedUntil = 0;     /* horodatage de fin de pause */
+        var dragging = false;
+        var inView = true;
+        var lastFrame = 0;
+
+        function groups() { return $$(".marquee__group", track); }
+
+        /* Deux copies suffisent en général ; sur très grand écran elles ne
+           remplissent pas la fenêtre et la boucle laisserait un trou. On ajoute
+           des copies jusqu'à couvrir la largeur visible. */
+        function ensureCopies() {
+            var gs = groups();
+            if (!gs.length) return;
+            var groupW = gs[0].getBoundingClientRect().width;
+            if (!groupW) return;
+            var needed = Math.min(8, Math.max(2, Math.ceil((vp.clientWidth + groupW) / groupW)));
+            while (groups().length < needed) track.appendChild(gs[0].cloneNode(true));
+        }
+
         function measure() {
-            var groups = $$(".marquee__group", track);
-            var groupW = 0;
-            if (groups.length >= 2) {
-                groupW = groups[1].offsetLeft - groups[0].offsetLeft;
-            } else if (track) {
-                groupW = track.scrollWidth / 2;
+            ensureCopies();
+            var gs = groups();
+            if (gs.length >= 2) {
+                span = gs[1].offsetLeft - gs[0].offsetLeft;
             }
-            var maxScroll = Math.max(0, vp.scrollWidth - vp.clientWidth);
-            span = Math.max(0, Math.min(groupW, maxScroll));
-            if (acc >= span && span > 0) acc = acc % span;
+            if (!span) span = track.scrollWidth / Math.max(1, gs.length);
+            if (span < 0) span = 0;
+            if (span > 0) offset = ((offset % span) + span) % span;
+            apply();
         }
 
-        function unpause() {
-            window.clearTimeout(resumeTimer);
-            acc = vp.scrollLeft; /* repartir de la position réelle après un geste manuel */
-            paused = false;
+        function apply() {
+            track.style.transform = "translate3d(" + (-offset).toFixed(2) + "px, 0, 0)";
         }
 
-        /* reprise de l'animation automatique après un temps de latence */
-        function resume(delay) {
-            window.clearTimeout(resumeTimer);
-            resumeTimer = window.setTimeout(unpause, delay);
+        function isScrollable() { return span > 8; }
+
+        function sync() {
+            var on = isScrollable();
+            if (prev) prev.disabled = !on;
+            if (next) next.disabled = !on;
+            if (fadeL) fadeL.style.opacity = on ? "1" : "0";
+            if (fadeR) fadeR.style.opacity = on ? "1" : "0";
+        }
+
+        function pause(ms) {
+            pausedUntil = Math.max(pausedUntil, Date.now() + ms);
+        }
+
+        function isPaused() {
+            /* le survol et le focus ne figent que temporairement : sans limite
+               de temps, un curseur immobile arrêtait le bandeau pour de bon */
+            return dragging || Date.now() < pausedUntil;
         }
 
         function step() {
@@ -506,107 +551,125 @@
             return item ? item.getBoundingClientRect().width + gap : 160;
         }
 
-        function sync() {
-            var max = vp.scrollWidth - vp.clientWidth;
-            if (prev) prev.disabled = vp.scrollLeft <= 4;
-            if (next) next.disabled = vp.scrollLeft >= max - 4;
-            if (fadeL) fadeL.style.opacity = vp.scrollLeft <= 4 ? "0" : "1";
-            if (fadeR) fadeR.style.opacity = vp.scrollLeft >= max - 4 ? "0" : "1";
+        function nudge(dir) {
+            /* déplacement manuel : on avance dans le même espace de bouclage */
+            pause(ACTION_IDLE);
+            if (!span) return;
+            var delta = dir * step() * 1.6;
+            offset = ((offset + delta) % span + span) % span;
+            track.style.transition = reduce.matches ? "none" : "transform .45s cubic-bezier(.22,.61,.36,1)";
+            apply();
+            window.setTimeout(function () { track.style.transition = ""; }, 460);
         }
 
         vp.addEventListener("scroll", sync, { passive: true });
         window.addEventListener("resize", function () { measure(); sync(); });
         window.addEventListener("load", function () { measure(); sync(); });
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); sync(); });
-        measure();
-        sync();
-
-        /* pause de l'animation automatique au survol / au toucher / au clavier */
-        vp.addEventListener("pointerenter", function () { paused = true; });
-        vp.addEventListener("pointerleave", unpause);
-        vp.addEventListener("focusin", function () { paused = true; });
-        vp.addEventListener("focusout", unpause);
-        vp.addEventListener("pointerdown", function () { paused = true; window.clearTimeout(resumeTimer); });
-        vp.addEventListener("pointerup", function () { resume(5000); });
-
-        function scrollByStep(dir) {
-            paused = true;
-            vp.scrollBy({ left: dir * step() * 1.6, behavior: reduce.matches ? "auto" : "smooth" });
-            resume(5000);
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(function () { measure(); sync(); });
         }
 
-        if (prev) prev.addEventListener("click", function () { scrollByStep(-1); });
-        if (next) next.addEventListener("click", function () { scrollByStep(1); });
+        /* --- Survol : pause pendant le mouvement, puis reprise automatique --- */
+        function hoverActivity(e) {
+            if (e && e.pointerType && e.pointerType !== "mouse") return;
+            pause(HOVER_IDLE);      /* pause glissante : chaque mouvement la repousse */
+        }
+        vp.addEventListener("pointerenter", hoverActivity);
+        vp.addEventListener("pointermove", hoverActivity);
+        vp.addEventListener("pointerleave", function () {
+            /* on repart vite : le survol n'est qu'une pause de confort */
+            pausedUntil = Math.min(pausedUntil, Date.now() + 400);
+        });
 
-        /* molette verticale → défilement horizontal du bandeau */
+        /* --- Clavier : pause pendant la navigation, reprise après inactivité --- */
+        vp.addEventListener("focusin", function () { pause(FOCUS_IDLE); });
+        vp.addEventListener("focusout", function () { pausedUntil = Math.min(pausedUntil, Date.now() + 400); });
+        vp.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowRight") { e.preventDefault(); nudge(1); }
+            if (e.key === "ArrowLeft") { e.preventDefault(); nudge(-1); }
+            if (e.key === "Home") { e.preventDefault(); pause(ACTION_IDLE); offset = 0; apply(); }
+            if (e.key === "End") { e.preventDefault(); pause(ACTION_IDLE); offset = span - 1; apply(); }
+        });
+
+        if (prev) prev.addEventListener("click", function () { nudge(-1); });
+        if (next) next.addEventListener("click", function () { nudge(1); });
+
+        /* --- Molette verticale → défilement horizontal --- */
         vp.addEventListener("wheel", function (e) {
             if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-            var max = vp.scrollWidth - vp.clientWidth;
-            if (max <= 0) return;
-            var target = vp.scrollLeft + e.deltaY;
-            if ((target <= 0 && e.deltaY < 0) || (target >= max && e.deltaY > 0)) return;
+            if (!span) return;
+            var delta = e.deltaY;
+            /* on n'intercepte que si l'on peut encore bouger : sinon la page
+               reprend la main, mais le bandeau ne se fige pas */
             e.preventDefault();
-            paused = true;
-            vp.scrollLeft = target;
-            acc = vp.scrollLeft;
-            resume(3000);
+            offset = ((offset + delta) % span + span) % span;
+            pause(ACTION_IDLE);
+            apply();
         }, { passive: false });
 
-        /* glisser à la souris */
-        var dragging = false, startX = 0, startScroll = 0;
+        /* --- Glisser à la souris / au doigt --- */
+        var startX = 0, startOffset = 0, dragMoved = false;
         vp.addEventListener("pointerdown", function (e) {
             if (e.pointerType === "mouse" && e.button !== 0) return;
             dragging = true;
+            dragMoved = false;
             startX = e.clientX;
-            startScroll = vp.scrollLeft;
+            startOffset = offset;
             vp.classList.add("is-dragging");
         });
         vp.addEventListener("pointermove", function (e) {
             if (!dragging) return;
             var dx = e.clientX - startX;
-            if (Math.abs(dx) > 3) vp.setPointerCapture && vp.setPointerCapture(e.pointerId);
-            vp.scrollLeft = startScroll - dx;
-            acc = vp.scrollLeft;
-        });
-        ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
-            vp.addEventListener(ev, function () {
-                dragging = false;
-                vp.classList.remove("is-dragging");
-            });
-        });
-
-        /* clavier : le viewport est focusable (la piste est décorative) */
-        function jumpTo(left) {
-            paused = true;
-            vp.scrollTo({ left: left, behavior: "smooth" });
-            resume(5000);
-        }
-
-        vp.addEventListener("keydown", function (e) {
-            if (e.key === "ArrowRight") { e.preventDefault(); scrollByStep(1); }
-            if (e.key === "ArrowLeft") { e.preventDefault(); scrollByStep(-1); }
-            if (e.key === "Home") { e.preventDefault(); jumpTo(0); }
-            if (e.key === "End") { e.preventDefault(); jumpTo(vp.scrollWidth); }
-        });
-
-        /* boucle de défilement : un pas toutes les 0,10 s (indépendant du taux d'images),
-           boucle invisible après la largeur d'un groupe */
-        function tick() {
-            if (document.hidden) return; /* onglet en arrière-plan : ne pas faire défiler pour rien */
-            if (!paused && !reduce.matches && inView && span > 4) {
-                acc += STEP;
-                if (acc >= span) acc -= span;
-                vp.scrollLeft = acc;
+            if (Math.abs(dx) > 3) {
+                dragMoved = true;
+                vp.setPointerCapture && vp.setPointerCapture(e.pointerId);
             }
+            if (!dragMoved || !span) return;
+            var next = startOffset - dx;
+            offset = ((next % span) + span) % span;
+            apply();
+        });
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            vp.classList.remove("is-dragging");
+            pause(1500);
         }
-        window.setInterval(tick, 100);
+        ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+            vp.addEventListener(ev, endDrag);
+        });
 
-        /* ne pas laisser le bandeau défiler inutilement hors écran */
+        /* --- Boucle d'animation : vitesse constante en px/s --- */
+        function frame(ts) {
+            window.requestAnimationFrame(frame);
+            var dt = lastFrame ? (ts - lastFrame) / 1000 : 0;
+            lastFrame = ts;
+            if (dt <= 0) return;
+            if (dt > 0.1) dt = 0.1;    /* retour d'onglet : ne pas rattraper d'un coup */
+
+            if (!span || reduce.matches || document.hidden || !inView || isPaused()) return;
+
+            offset += SPEED * dt;
+            if (offset >= span) offset -= span * Math.floor(offset / span);
+            apply();
+        }
+        window.requestAnimationFrame(frame);
+
+        /* Les copies ajoutées changent la largeur : on remesure pour rester juste */
+        if ("ResizeObserver" in window) {
+            var ro = new ResizeObserver(function () { measure(); sync(); });
+            ro.observe(track);
+        }
+
+        /* Ne pas animer un bandeau hors écran */
         if ("IntersectionObserver" in window) {
             new IntersectionObserver(function (entries) {
                 entries.forEach(function (entry) { inView = entry.isIntersecting; });
             }, { threshold: 0 }).observe(vp);
         }
+
+        measure();
+        sync();
     })();
 
     /* Défilement doux pour les ancres (compatibilité navigateurs anciens) */
