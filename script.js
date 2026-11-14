@@ -454,12 +454,18 @@
         });
     });
 
-    /* Carrousel des technos : défilement horizontal maîtrisé.
+    /* Carrousel des technos : défilement horizontal, automatique par défaut.
        Le défilement est natif (scroll-snap) : molette, trackpad, balayage
-       tactile et clavier fonctionnent sans code. Le JS ajoute ce que le
-       natif ne donne pas : boutons précédent/suivant, compteur « 3 / 11 »,
-       barre de progression, glisser à la souris et alignement carte par carte.
-       Aucun défilement automatique : l'utilisateur garde le contrôle. */
+       tactile et clavier fonctionnent sans code. Le JS ajoute l'avance
+       automatique, les boutons, le compteur « 3 / 11 », la barre de
+       progression, le glisser à la souris et l'alignement carte par carte.
+
+       L'autoplay s'arrête temporairement dès que l'utilisateur manifeste une
+       intention (survol, focus, molette, glisser, bouton) puis reprend tout
+       seul : un carrousel qui repart sous le doigt est plus déroutant qu'un
+       carrousel figé. Il se met en pause pour de bon si l'utilisateur clique
+       sur pause, si l'onglet est masqué, si la section sort de l'écran ou si
+       `prefers-reduced-motion` est demandé. */
     (function () {
         var track = $("[data-carousel]");
         if (!track) return;
@@ -469,9 +475,19 @@
         var counter = $("[data-carousel-count]");
         var progress = $("[data-carousel-progress]");
         var cards = $$(".tech-card", track);
+        var toggle = $("[data-carousel-toggle]");
         var reduce = window.matchMedia
             ? window.matchMedia("(prefers-reduced-motion: reduce)")
             : { matches: false };
+
+        var DELAY = 3200;        /* temps d'arrêt sur chaque page, en ms */
+        var IDLE_RESUME = 4000;  /* reprise 4 s après la dernière interaction */
+        var userPaused = false;  /* pause explicite (bouton) ou reduce-motion */
+        var inView = true;       /* la section est visible à l'écran */
+        var hovering = false;    /* le curseur est sur le carrousel */
+        var dragging = false;
+        var interactingUntil = 0;
+        var timer = null;
 
         function maxScroll() { return Math.max(0, track.scrollWidth - track.clientWidth); }
 
@@ -556,6 +572,87 @@
             }
         }
 
+        /* ------------------------------------------------------------------
+           Avance automatique
+           ------------------------------------------------------------------ */
+        function blocked() {
+            return userPaused || reduce.matches || document.hidden || !inView
+                || hovering || dragging || maxScroll() <= 2;
+        }
+
+        /* Un seul minuteur, recalculé à chaque changement d'état : on attend
+           exactement la fin de la pause au lieu de sonder toutes les 3 s. */
+        function scheduleNext() {
+            window.clearTimeout(timer);
+            var wait = Math.max(120, interactingUntil - Date.now());
+            if (!blocked()) wait = Math.max(120, wait > 0 ? wait : DELAY);
+            timer = window.setTimeout(tick, wait);
+        }
+
+        function tick() {
+            if (blocked()) {
+                /* survol / onglet masqué / hors écran : on réessaie, sans avancer */
+                timer = window.setTimeout(tick, 600);
+                return;
+            }
+            /* à la fin, on revient au début plutôt que de rester en butée */
+            if (track.scrollLeft >= maxScroll() - 2) goToIndex(0, true);
+            else goToIndex(nextIndex(), true);
+            scheduleNext();
+        }
+
+        /* Prochaine carte hors écran : l'autoplay avance carte par carte,
+           une page entière ferait sauter les cartes intermédiaires. */
+        function nextIndex() {
+            var last = nearestIndex();
+            var limit = last + visibleCount();
+            var i = last + 1;
+            while (i < cards.length && i <= limit && leftOf(i) <= maxScroll() + 1) {
+                if (leftOf(i) > track.scrollLeft + 2) return i;
+                i++;
+            }
+            return last + 1;
+        }
+
+        /* Pause temporaire : toute interaction repousse la reprise */
+        function holdPlayback(ms) {
+            interactingUntil = Math.max(interactingUntil, Date.now() + (ms == null ? IDLE_RESUME : ms));
+            scheduleNext();
+        }
+
+        function syncToggle() {
+            if (!toggle) return;
+            var paused = userPaused || reduce.matches;
+            toggle.setAttribute("aria-pressed", paused ? "true" : "false");
+            toggle.setAttribute("aria-label", paused
+                ? "Reprendre le défilement automatique"
+                : "Mettre le défilement automatique en pause");
+            toggle.classList.toggle("is-paused", paused);
+        }
+
+        if (toggle) {
+            toggle.addEventListener("click", function () {
+                userPaused = !userPaused;
+                syncToggle();
+                if (userPaused) {
+                    window.clearTimeout(timer);
+                } else {
+                    interactingUntil = Date.now() + 800;
+                    scheduleNext();
+                }
+            });
+        }
+
+        /* Survol : on met en pause, on reprend quand la souris s'en va */
+        track.addEventListener("pointerenter", function (e) {
+            if (e.pointerType && e.pointerType !== "mouse") return;
+            hovering = true;
+        });
+        track.addEventListener("pointerleave", function () {
+            hovering = false;
+            scheduleNext();
+        });
+
         var ticking = false;
         track.addEventListener("scroll", function () {
             if (ticking) return;
@@ -563,12 +660,19 @@
             window.requestAnimationFrame(function () { update(); ticking = false; });
         }, { passive: true });
 
-        if (prev) prev.addEventListener("click", function () { step(-1); });
-        if (next) next.addEventListener("click", function () { step(1); });
+        if (prev) prev.addEventListener("click", function () { holdPlayback(); step(-1); });
+        if (next) next.addEventListener("click", function () { holdPlayback(); step(1); });
 
         /* Clavier : flèches, Début, Fin, Page précédente/suivante */
         track.addEventListener("keydown", function (e) {
             var k = e.key;
+            if (k === "Escape" && toggle && userPaused) {
+                userPaused = false; syncToggle(); holdPlayback(); return;
+            }
+            if (k.indexOf("Arrow") === 0 || k === "Home" || k === "End" ||
+                k === "PageUp" || k === "PageDown") {
+                holdPlayback();
+            }
             if (k === "ArrowRight" || k === "ArrowLeft") {
                 e.preventDefault();
                 goToIndex(nearestIndex() + (k === "ArrowRight" ? 1 : -1), true);
@@ -594,6 +698,7 @@
             e.preventDefault();
             track.scrollLeft = Math.max(0, Math.min(max, track.scrollLeft + e.deltaY));
             update();
+            holdPlayback(5000);
         }, { passive: false });
 
         /* Glisser à la souris (le tactile est déjà géré nativement) */
@@ -601,6 +706,7 @@
         track.addEventListener("pointerdown", function (e) {
             if (e.pointerType !== "mouse" || e.button !== 0) return;
             dragging = true; moved = false;
+            window.clearTimeout(timer);
             startX = e.clientX; startLeft = track.scrollLeft;
         });
         track.addEventListener("pointermove", function (e) {
@@ -619,8 +725,10 @@
             if (moved) {
                 track.classList.remove("is-dragging");
                 goToIndex(nearestIndex(), true);
+                holdPlayback(5000);
             }
             update();
+            scheduleNext();
             moved = false;
         }
         ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
@@ -628,14 +736,38 @@
         });
 
         /* Redimensionnement / chargement des polices : la géométrie change */
-        window.addEventListener("resize", update);
-        window.addEventListener("load", update);
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(update);
+        function refresh() { update(); scheduleNext(); }
+        window.addEventListener("resize", refresh);
+        window.addEventListener("load", refresh);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
         if ("ResizeObserver" in window) {
-            new ResizeObserver(update).observe(track);
+            new ResizeObserver(refresh).observe(track);
         }
 
+        /* Onglet en arrière-plan : on ne fait pas défiler dans le vide */
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) window.clearTimeout(timer);
+            else scheduleNext();
+        });
+
+        /* Hors écran : pause ; au retour, on repart */
+        if ("IntersectionObserver" in window) {
+            new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    inView = entry.isIntersecting;
+                    if (inView) scheduleNext();
+                });
+            }, { threshold: 0.25 }).observe(track);
+        }
+
+        /* Changement de préférence d'animation en cours de session */
+        if (reduce.addEventListener) {
+            reduce.addEventListener("change", function () { syncToggle(); scheduleNext(); });
+        }
+
+        syncToggle();
         update();
+        scheduleNext();
     })();
 
     /* Défilement doux pour les ancres (compatibilité navigateurs anciens) */

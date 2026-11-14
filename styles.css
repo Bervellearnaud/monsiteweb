@@ -956,6 +956,9 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .tech-track::-webkit-scrollbar { display: none; }
 .tech-track.is-dragging { cursor: grabbing; scroll-behavior: auto; }
+
+/* Pendant l'avance automatique, le survol ne doit pas déclencher de sélection */
+.tech-track { user-select: none; -webkit-user-select: none; }
 .tech-track.is-dragging .tech-card { pointer-events: none; }
 .tech-track:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: var(--radius); }
 
@@ -1054,6 +1057,13 @@ html[data-theme="dark"] .tech-card {
 .carousel__nav:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .carousel__nav[disabled] { opacity: .32; cursor: default; }
 .carousel__nav[disabled]:hover { background: var(--surface); border-color: var(--line-strong); color: var(--ink-2); }
+
+/* Bouton pause / lecture de l'avance automatique : l'icône affichée dépend de
+   l'état réel (pause si le défilement tourne, lecture s'il est arrêté). */
+.carousel__nav--toggle .ico-play { display: none; }
+.carousel__nav--toggle.is-paused .ico-pause { display: none; }
+.carousel__nav--toggle.is-paused .ico-play { display: block; }
+.carousel__nav--toggle.is-paused { color: var(--brand-strong); border-color: color-mix(in srgb, var(--brand) 40%, var(--line-strong)); }
 
 @media (max-width: 900px) {
     .tech-card { flex-basis: clamp(150px, 34%, 240px); }
