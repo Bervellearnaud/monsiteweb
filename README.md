@@ -61,7 +61,10 @@ offre, réassurance, action.
    navigation clavier.
 3. **Expertises (`#services`)** — web, SEO, e-commerce, data, réseaux et serveurs.
 4. **Réalisations (`#realisations`)** — projets réels en grille 2 × 2 sur desktop,
-   avec filtres, galeries d'images, visionneuse et liens vers les démos.
+   avec filtres, galeries d'images, visionneuse et liens vers les démos. Les quatre
+   cartes partagent le même principe d'affiche : titre, accroche et badges à gauche,
+   maquette multi-écrans à droite. Paintball 2D et Puzzle Studio utilisent en plus
+   une variante verticale (`*-cover-tall.webp`) sous 620 px via `<picture>`.
 5. **Chiffres clés** — bandeau sombre : délai de réponse, étendue des expertises,
    sur-mesure et interlocuteur unique.
 6. **Croissance / SEO (`#croissance`)** — visibilité Google, acquisition locale,
@@ -133,7 +136,10 @@ Les contenus sont volontairement écrits en clair dans `index.html` :
 - titres et argumentaire : directement dans chaque `<section>` ;
 - FAQ : éléments `<details class="qa">` ;
 - forfaits Starlink et tarifs : bloc `.sl-plans` ;
-- réalisations et liens de démonstration : cartes `.project`.
+- réalisations et liens de démonstration : cartes `.project` ;
+- affiches de couverture : images `assets/img/*-cover.webp` (1200 × 675) et leur
+  variante mobile `*-cover-tall.webp` (880 × 1100), stylées par `.project--poster`
+  (recadrage à gauche pour ne jamais couper le titre).
 
 ## Accessibilité
 

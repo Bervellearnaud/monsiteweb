@@ -1529,6 +1529,24 @@ html[data-theme="dark"] .project__badge { color: #63d99b; }
 
 .link-btn--solid:hover { color: #fff; background: var(--grad); filter: brightness(1.06); }
 
+/* Affiches de couverture (Paintball 2D, Puzzle Studio) : le visuel contient
+   déjà le titre, l'accroche et les badges à gauche → on ne recadre jamais
+   cette zone, quel que soit l'écran. */
+.project--poster .project__media img {
+    object-position: left center;
+}
+
+/* Pas de voile sombre au survol : ces affiches sont claires, le dégradé
+   existant salirait le fond. */
+.project--poster .project__media::after { display: none; }
+
+/* Sur mobile, l'affiche verticale remplace le format 16:9 : on laisse le
+   titre respirer en plein cadre plutôt que de le rogner. */
+@media (max-width: 620px) {
+    .project--poster .project__media { aspect-ratio: 4 / 5; }
+    .project--poster .project__media img { object-position: center top; }
+}
+
 @media (max-width: 900px) {
     .projects { grid-template-columns: 1fr; }
 

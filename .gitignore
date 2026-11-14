@@ -3,3 +3,4 @@
 .shot/
 node_modules/
 .DS_Store
+.preview_look/

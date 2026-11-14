@@ -313,11 +313,26 @@
     var lbIndex = 0;
     var lbReturnFocus = null;
 
+    function currentMainSrc(main) {
+        // <picture> : le navigateur peut afficher un <source> différent de l'attribut src
+        var pic = main.closest("picture");
+        if (pic) {
+            var sources = $$("source", pic);
+            for (var i = 0; i < sources.length; i++) {
+                var mq = sources[i].getAttribute("media");
+                var ok = true;
+                try { ok = !mq || !window.matchMedia || window.matchMedia(mq).matches; } catch (e) { ok = true; }
+                if (ok) return sources[i].getAttribute("srcset") || main.getAttribute("src");
+            }
+        }
+        return main.getAttribute("src");
+    }
+
     function galleryOf(card) {
         var items = [];
         var main = $("img[data-main]", card);
         if (main) {
-            items.push({ src: main.getAttribute("src"), caption: main.getAttribute("alt") || "", alt: main.getAttribute("alt") || "" });
+            items.push({ src: currentMainSrc(main), caption: main.getAttribute("alt") || "", alt: main.getAttribute("alt") || "" });
         }
         $$(".project__thumbs button", card).forEach(function (btn) {
             var img = $("img", btn);
@@ -370,14 +385,18 @@
         var main = $("img[data-main]", media);
         var thumbs = $$(".project__thumbs button", card);
         var items = galleryOf(card);
+        var picked = -1;   // -1 : l'affiche de couverture est encore à l'écran
 
         thumbs.forEach(function (btn, i) {
             btn.addEventListener("click", function (e) {
+                picked = i;
                 e.preventDefault();
                 e.stopPropagation();
                 if (!main) return;
                 main.style.opacity = "0";
                 window.setTimeout(function () {
+                    var pic = main.closest("picture");
+                    if (pic) $$("source", pic).forEach(function (src) { src.remove(); });
                     main.setAttribute("src", items[i + 1].src);
                     main.setAttribute("alt", items[i + 1].caption);
                     main.style.opacity = "1";
@@ -392,8 +411,7 @@
         if (zoom) {
             zoom.addEventListener("click", function (e) {
                 e.preventDefault();
-                var activeIndex = thumbs.findIndex(function (b) { return b.classList.contains("is-active"); });
-                openLightbox(items, activeIndex + 1, zoom);
+                openLightbox(items, picked + 1, zoom);
             });
         }
 
@@ -403,8 +421,7 @@
             media.style.cursor = "zoom-in";
             media.addEventListener("click", function (e) {
                 if (e.target.closest("button, a")) return;
-                var activeIndex = thumbs.findIndex(function (b) { return b.classList.contains("is-active"); });
-                openLightbox(items, activeIndex + 1, media);
+                openLightbox(items, picked + 1, media);
             });
         }
     });
