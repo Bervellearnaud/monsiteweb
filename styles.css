@@ -880,162 +880,199 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 }
 
 /* --------------------------------------------------------------------------
-   6. Bandeau technos
+   6. Carrousel des technos
    -------------------------------------------------------------------------- */
 .stack-strip {
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     background:
         linear-gradient(90deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--bg-alt) 88%, var(--bg)), color-mix(in srgb, var(--surface) 92%, transparent));
-    padding-block: 1.15rem;
-    overflow: hidden;
+    padding-block: clamp(1.15rem, 2.4vw, 1.75rem);
     isolation: isolate;
 }
 
+/* En-tête : le titre à gauche, les commandes à droite, sur une seule ligne */
 .stack-strip__head {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .75rem 1rem;
     margin-bottom: .85rem;
 }
 
 .stack-strip__label {
-    grid-column: 2;
-    justify-self: center;
     font-size: .74rem;
     letter-spacing: .13em;
     text-transform: uppercase;
     color: var(--muted);
-    text-align: center;
     margin: 0;
     font-weight: 700;
 }
 
-/* flèches ancrées à droite, sans jamais sortir du conteneur */
 .stack-strip__nav {
-    grid-column: 3;
-    justify-self: end;
     display: flex;
+    align-items: center;
     gap: .5rem;
 }
 
+/* Compteur « 3 / 11 » : repère explicite que le contenu défile */
+.carousel__count {
+    font-size: .74rem;
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    margin-right: .25rem;
+}
 
-/* Bandeau : défilement automatique en continu (boucle infinie, invisible du fait du contenu dupliqué) */
-/* Le bandeau est une fenêtre : c'est `.marquee__window` qui coupe le débordement,
-   ce qui laisse les bords estompés à l'intérieur de la fenêtre et non rognés. */
+/* La fenêtre coupe le débordement : les cartes qui dépassent sont visibles
+   jusqu'au bord, ce qui rend le défilement évident, sans fondus trompeurs. */
 .stack-strip__viewport {
     position: relative;
     width: calc(100% - (var(--pad) * 2));
     max-width: calc(var(--wrap) - (var(--pad) * 2));
     margin-inline: auto;
-    padding-block: .2rem;
-    background: color-mix(in srgb, var(--surface) 78%, transparent);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-xs), inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent);
-}
-
-.marquee__window {
-    position: relative;
     overflow: hidden;
-    border-radius: inherit;
-    /* pas de marge négative : le track est translaté, jamais la fenêtre */
+    padding-block: .2rem;
 }
 
-/* Pas de sélection de texte pendant le défilement ni pendant un glisser */
-.marquee,
-.marquee__window { user-select: none; -webkit-user-select: none; }
-
-/* La piste est translatée par JS (transform) : animation au taux d'images,
-   sans ascenseur et donc sans saut d'un pas à l'autre. */
-.marquee {
+/* Piste : défilement horizontal natif (molette, trackpad, glisser, clavier),
+   aligné par carte grâce à scroll-snap. */
+.tech-track {
     display: flex;
-    width: max-content;
-    border-radius: 999px;
+    gap: .8rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: .35rem .35rem .85rem;
+    margin-block: -.35rem;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
     cursor: grab;
-    will-change: transform;
 }
 
-.stack-strip__viewport.is-dragging .marquee { cursor: grabbing; }
+.tech-track::-webkit-scrollbar { display: none; }
+.tech-track.is-dragging { cursor: grabbing; scroll-behavior: auto; }
+.tech-track.is-dragging .tech-card { pointer-events: none; }
+.tech-track:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: var(--radius); }
 
-.stack-strip__viewport.is-dragging .marquee__item { pointer-events: none; }
-
-.stack-strip__viewport:focus-visible {
-    outline: 2px solid var(--brand);
-    outline-offset: 3px;
+/* Carte : gabarit fixe, calé sur la largeur de la fenêtre pour montrer
+   nettement « 3 cartes et une amorce » sur desktop. */
+.tech-card {
+    flex: 0 0 clamp(150px, 27%, 240px);
+    scroll-snap-align: start;
+    display: grid;
+    gap: .18rem;
+    padding: .85rem .9rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), var(--surface));
+    box-shadow: var(--shadow-xs), inset 0 1px 0 color-mix(in srgb, #fff 68%, transparent);
+    transition: border-color var(--t), box-shadow var(--t), transform var(--t);
 }
 
-.marquee__group {
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-    padding-right: 3rem;
+.tech-card:hover {
+    border-color: color-mix(in srgb, var(--brand) 32%, var(--line-strong));
+    box-shadow: var(--shadow-sm), inset 0 1px 0 color-mix(in srgb, #fff 75%, transparent);
+    transform: translateY(-2px);
 }
 
-/* Bords estompés (frères de la fenêtre : ils restent au-dessus du contenu) */
-.marquee__fade {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 76px;
-    pointer-events: none;
-    z-index: 2;
-    transition: opacity var(--t);
+html[data-theme="dark"] .tech-card {
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
 }
 
-.marquee__fade--l {
-    left: 0;
-    background: linear-gradient(to right, var(--surface), transparent);
-}
-
-.marquee__fade--r {
-    right: 0;
-    background: linear-gradient(to left, var(--surface), transparent);
-}
-
-/* Flèches de défilement (dans la barre de titre) */
-.marquee__nav {
+.tech-card__ico {
     display: grid;
     place-items: center;
     width: 32px;
     height: 32px;
+    border-radius: 10px;
+    background: var(--brand-tint);
+    color: var(--brand-strong);
+    margin-bottom: .15rem;
+}
+
+.tech-card__ico svg { width: 17px; height: 17px; }
+
+.tech-card__cat {
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.tech-card__name {
+    font-size: .9rem;
+    color: var(--ink);
+    line-height: 1.25;
+}
+
+/* Barre de progression du carrousel : fine, toujours visible, elle indique
+   d'un coup d'œil qu'il reste du contenu à droite. */
+.tech-scrollbar {
+    width: calc(100% - (var(--pad) * 2));
+    max-width: calc(var(--wrap) - (var(--pad) * 2));
+    margin: .55rem auto 0;
+    height: 3px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand) 12%, transparent);
+    overflow: hidden;
+}
+
+.tech-scrollbar i {
+    display: block;
+    height: 100%;
+    width: 30%;
+    border-radius: inherit;
+    background: var(--grad);
+    transform: translateX(0);
+    transition: transform .12s linear, width .2s var(--ease);
+}
+
+/* Flèches de commande */
+.carousel__nav {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: 1px solid var(--line-strong);
     background: var(--surface);
     color: var(--ink-2);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transition: var(--t);
+    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), opacity var(--t-fast);
 }
 
-.marquee__nav svg { width: 16px; height: 16px; }
-.marquee__nav:hover { background: var(--brand); border-color: transparent; color: #fff; }
-.marquee__nav:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.marquee__nav[disabled] { opacity: .35; cursor: default; }
+.carousel__nav svg { width: 16px; height: 16px; }
+.carousel__nav:hover { background: var(--brand); border-color: transparent; color: #fff; }
+.carousel__nav:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.carousel__nav[disabled] { opacity: .32; cursor: default; }
+.carousel__nav[disabled]:hover { background: var(--surface); border-color: var(--line-strong); color: var(--ink-2); }
+
+@media (max-width: 900px) {
+    .tech-card { flex-basis: clamp(150px, 34%, 240px); }
+}
 
 @media (max-width: 620px) {
-    .marquee__fade { width: 34px; }
-    .marquee__nav { width: 30px; height: 30px; }
-    .marquee__nav svg { width: 15px; height: 15px; }
-    .stack-strip__head { grid-template-columns: 1fr; gap: .25rem; }
-    .stack-strip__nav { display: none; }  /* le balayage tactile suffit */
-    .stack-strip__label { grid-column: 1; font-size: .68rem; letter-spacing: .1em; }
-    .marquee__group { gap: 1.7rem; padding-right: 1.7rem; }
+    .stack-strip__head { flex-direction: column; align-items: flex-start; gap: .5rem; }
+    .stack-strip__nav { width: 100%; justify-content: space-between; }
+    .carousel__count { margin-right: auto; }
+    .tech-card { flex-basis: min(70vw, 250px); }
+    .tech-scrollbar { margin-top: .4rem; }
+    .carousel__nav { width: 32px; height: 32px; }
 }
 
-.marquee__item {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    font-size: .92rem;
-    font-weight: 600;
-    color: var(--ink-2);
-    opacity: .84;
-    white-space: nowrap;
+@media (prefers-reduced-motion: reduce) {
+    .tech-track { scroll-behavior: auto; }
+    .tech-card { transition: none; }
+    .tech-card:hover { transform: none; }
 }
-
-.marquee__item svg { width: 17px; height: 17px; color: var(--brand); }
 
 /* --------------------------------------------------------------------------
    7. Services
@@ -2616,8 +2653,6 @@ html[data-theme="dark"] .footer__links a:hover { color: var(--brand-soft); }
 
 .stack-strip__viewport::-webkit-scrollbar { display: none; }
 
-.marquee__fade--l { background: linear-gradient(to right, color-mix(in srgb, var(--surface) 96%, transparent), transparent); }
-.marquee__fade--r { background: linear-gradient(to left, color-mix(in srgb, var(--surface) 96%, transparent), transparent); }
 
 /* Alterner les fonds avec davantage de relief, sans casser la lecture */
 .section--tint {
