@@ -862,20 +862,79 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
     overflow: hidden;
 }
 
+.stack-strip__head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: .85rem;
+}
+
 .stack-strip__label {
     font-size: .74rem;
     letter-spacing: .13em;
     text-transform: uppercase;
     color: var(--muted);
     text-align: center;
-    margin-bottom: .85rem;
+    margin: 0;
+}
+
+.stack-strip__label {
+    flex: 1;
+    margin: 0;
+}
+
+/* flèches ancrées à droite : le titre reste exactement au centre */
+.stack-strip__nav {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: .4rem;
+}
+
+
+/* Bandeau défilable : la piste est un conteneur scrollable (molette, drag, clavier, flèches) */
+.stack-strip__viewport {
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--brand) 34%, transparent) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.stack-strip__viewport::-webkit-scrollbar { height: 6px; }
+.stack-strip__viewport::-webkit-scrollbar-track { background: transparent; }
+.stack-strip__viewport::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--brand) 30%, transparent);
+    border-radius: 999px;
+}
+
+.stack-strip__viewport::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--brand) 55%, transparent);
 }
 
 .marquee {
     display: flex;
     width: max-content;
-    animation: marquee 38s linear infinite;
+    border-radius: 999px;
 }
+
+.marquee { cursor: grab; }
+
+.stack-strip__viewport.is-dragging .marquee { cursor: grabbing; }
+
+.stack-strip__viewport.is-dragging { scroll-behavior: auto; }
+.stack-strip__viewport.is-dragging .marquee__item { pointer-events: none; }
+
+.marquee:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 6px;
+}
+
+.marquee:focus-visible .marquee__item:first-child { outline: none; }
 
 .marquee__group {
     display: flex;
@@ -884,7 +943,56 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
     padding-right: 3rem;
 }
 
-.marquee:hover { animation-play-state: paused; }
+/* Bords estompés */
+.marquee__fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 76px;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity var(--t);
+}
+
+.marquee__fade--l {
+    left: 0;
+    background: linear-gradient(to right, var(--bg), transparent);
+}
+
+.marquee__fade--r {
+    right: 0;
+    background: linear-gradient(to left, var(--bg), transparent);
+}
+
+/* Flèches de défilement (dans la barre de titre) */
+.marquee__nav {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink-2);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: var(--t);
+}
+
+.marquee__nav svg { width: 16px; height: 16px; }
+.marquee__nav:hover { background: var(--brand); border-color: transparent; color: #fff; }
+.marquee__nav:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.marquee__nav[disabled] { opacity: .35; cursor: default; }
+
+@media (max-width: 620px) {
+    .marquee__fade { width: 34px; }
+    .marquee__nav { width: 30px; height: 30px; }
+    .marquee__nav svg { width: 15px; height: 15px; }
+    .stack-strip__head { gap: .6rem; }
+    .stack-strip__nav { display: none; }  /* le balayage tactile suffit */
+    .stack-strip__label { font-size: .68rem; letter-spacing: .1em; }
+    .marquee__group { gap: 1.7rem; padding-right: 1.7rem; }
+}
 
 .marquee__item {
     display: inline-flex;
@@ -899,8 +1007,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .marquee__item svg { width: 17px; height: 17px; color: var(--brand); }
 
-@keyframes marquee {
-    to { transform: translateX(-50%); }
 }
 
 /* --------------------------------------------------------------------------
