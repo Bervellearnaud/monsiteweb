@@ -467,13 +467,12 @@
         var fadeL = $(".marquee__fade--l", vp);
         var fadeR = $(".marquee__fade--r", vp);
         var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-        var SPEED = 65; /* pixels par seconde */
+        var STEP = 6.5;           /* pixels par pas : 65 px/s avec un intervalle de 0,10 s */
         var paused = false;
         var inView = !("IntersectionObserver" in window); /* rien tant que le bandeau n'est pas visible */
         var resumeTimer = null;
         var acc = vp.scrollLeft || 0; /* position flottante : accumule les sous-pixels (Safari tronque scrollLeft) */
         var span = 0;                 /* distance après laquelle on boucle */
-        var lastT = null;
 
         /* largeur d'un groupe : le contenu étant dupliqué, boucler à cette distance est invisible */
         function measure() {
@@ -590,20 +589,17 @@
             if (e.key === "End") { e.preventDefault(); jumpTo(vp.scrollWidth); }
         });
 
-        /* boucle de défilement : vitesse constante (indépendante du taux d'images),
+        /* boucle de défilement : un pas toutes les 0,10 s (indépendant du taux d'images),
            boucle invisible après la largeur d'un groupe */
-        function tick(t) {
-            if (lastT == null) lastT = t;
-            var dt = (t - lastT) / 1000;
-            lastT = t;
-            if (dt > 0.1) dt = 0.1; /* onglet en arrière-plan : ne pas téléporter le bandeau */
+        function tick() {
+            if (document.hidden) return; /* onglet en arrière-plan : ne pas faire défiler pour rien */
             if (!paused && !reduce.matches && inView && span > 4) {
-                acc += SPEED * dt;
+                acc += STEP;
                 if (acc >= span) acc -= span;
                 vp.scrollLeft = acc;
             }
-            window.requestAnimationFrame(tick);
         }
+        window.setInterval(tick, 100);
 
         /* ne pas laisser le bandeau défiler inutilement hors écran */
         if ("IntersectionObserver" in window) {
@@ -611,7 +607,6 @@
                 entries.forEach(function (entry) { inView = entry.isIntersecting; });
             }, { threshold: 0 }).observe(vp);
         }
-        window.requestAnimationFrame(tick);
     })();
 
     /* Défilement doux pour les ancres (compatibilité navigateurs anciens) */
