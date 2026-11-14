@@ -467,7 +467,7 @@
         var fadeL = $(".marquee__fade--l", vp);
         var fadeR = $(".marquee__fade--r", vp);
         var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-        var SPEED = 40; /* pixels par seconde */
+        var SPEED = 65; /* pixels par seconde */
         var paused = false;
         var inView = !("IntersectionObserver" in window); /* rien tant que le bandeau n'est pas visible */
         var resumeTimer = null;
