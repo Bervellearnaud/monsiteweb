@@ -51,8 +51,9 @@ demo/                    Démos autonomes exécutées dans le navigateur
 La page suit un parcours de conversion classique : promesse, preuves, méthode,
 offre, réassurance, action.
 
-1. **Hero (`#accueil`)** — proposition de valeur, CTA, preuves rapides et maquette
-   d'interface animée.
+1. **Hero (`#accueil`)** — proposition de valeur, CTA, preuves rapides, maquette
+   d'interface animée et rangée de trois cartes de synthèse alignées sous la
+   maquette (aucune superposition).
 2. **Bandeau technos** — « Les briques que nous maîtrisons » : bandeau défilant
    automatiquement et contrôlable manuellement (boutons, molette, glisser, clavier).
 3. **Expertises (`#services`)** — web, SEO, e-commerce, data, réseaux et serveurs.
