@@ -1529,8 +1529,31 @@ html[data-theme="dark"] .checks svg { color: #63d99b; }
 
 .checks__card span span { display: block; margin-top: .2rem; line-height: 1.55; }
 
+/* Trois cartes : la grille se resserre sur une seule ligne */
+.checks--grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 980px) {
+    .checks--grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Bloc d'introduction posé dans la section vidéosurveillance */
+.checks__lead { margin-top: 2.2rem; }
+
+.checks__card--lead {
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
+    border-color: rgba(28, 134, 184, .22);
+    box-shadow: var(--shadow-sm);
+}
+
+.checks__card--lead svg {
+    background: rgba(28, 134, 184, .14);
+    color: var(--brand-strong);
+}
+
 @media (max-width: 760px) {
     .checks--grid { grid-template-columns: 1fr; gap: .8rem; margin-top: 1.7rem; }
+    .checks--grid-3 { grid-template-columns: 1fr; }
+    .checks__lead { margin-top: 1.6rem; }
 }
 
 /* Panneau "analytics" */
