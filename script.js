@@ -517,20 +517,55 @@
             return best;
         }
 
+        var snapEndTimer = null;
+
+        /* Le moteur de scroll-snap annule parfois un scrollTo fluide vers un
+           point d'alignement (bug connu de Chromium et WebKit) : le bouton
+           semblait alors sans effet. On coupe le snap pendant le déplacement,
+           puis on le rétablit à la fin (événement scrollend, ou délai de
+           sécurité s'il n'existe pas). */
+        function restoreSnap() {
+            track.style.scrollSnapType = "";
+            track.classList.remove("is-snap-off");
+        }
+
         function goToIndex(i, smooth) {
             i = Math.max(0, Math.min(cards.length - 1, i));
             if (!cards[i]) return;
-            track.scrollTo({
-                left: leftOf(i),
-                behavior: (smooth && !reduce.matches) ? "smooth" : "auto"
-            });
+
+            var animate = smooth && !reduce.matches;
+            var snapping = "";
+            try { snapping = getComputedStyle(track).scrollSnapType || ""; } catch (e) {}
+            if (snapping && snapping !== "none") {
+                track.style.scrollSnapType = "none";
+                track.classList.add("is-snap-off");
+            }
+
+            window.clearTimeout(snapEndTimer);
+            snapEndTimer = window.setTimeout(restoreSnap, animate ? 750 : 140);
+            if ("onscrollend" in window) {
+                track.addEventListener("scrollend", function once() {
+                    track.removeEventListener("scrollend", once);
+                    window.clearTimeout(snapEndTimer);
+                    restoreSnap();
+                });
+            }
+
+            try {
+                track.scrollTo({ left: leftOf(i), behavior: animate ? "smooth" : "auto" });
+            } catch (err) {
+                track.scrollLeft = leftOf(i);   /* navigateurs sans options */
+            }
+
             /* certains navigateurs n'émettent pas `scroll` pour un scrollTo
                instantané : on rafraîchit l'état sans attendre l'événement */
             update();
         }
 
+        /* Un clic = une carte. Un saut de page entière donnait l'impression que
+           rien ne se passait près du début (borné à 0) et téléportait ailleurs. */
         function step(dir) {
-            goToIndex(nearestIndex() + dir * Math.max(1, Math.round(visibleCount())), true);
+            goToIndex(nearestIndex() + dir, true);
         }
 
         /* Nombre de cartes entièrement visibles : sert au saut de page et au compteur */
@@ -660,8 +695,10 @@
             window.requestAnimationFrame(function () { update(); ticking = false; });
         }, { passive: true });
 
-        if (prev) prev.addEventListener("click", function () { holdPlayback(); step(-1); });
-        if (next) next.addEventListener("click", function () { holdPlayback(); step(1); });
+        /* Après un clic, on laisse 6 s : à 0,8 s par carte, l'avance automatique
+           reprenait avant qu'on ait pu regarder la carte atteinte. */
+        if (prev) prev.addEventListener("click", function () { holdPlayback(6000); step(-1); });
+        if (next) next.addEventListener("click", function () { holdPlayback(6000); step(1); });
 
         /* Clavier : flèches, Début, Fin, Page précédente/suivante */
         track.addEventListener("keydown", function (e) {

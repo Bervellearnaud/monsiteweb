@@ -957,6 +957,11 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .tech-track::-webkit-scrollbar { display: none; }
 .tech-track.is-dragging { cursor: grabbing; scroll-behavior: auto; }
 
+/* Le snap est neutralisé le temps d'un déplacement programmé (boutons, clavier,
+   avance automatique) : sans cela Chromium et WebKit peuvent annuler le
+   scrollTo et le bouton paraît inerte. */
+.tech-track.is-snap-off { scroll-snap-type: none; }
+
 /* Pendant l'avance automatique, le survol ne doit pas déclencher de sélection */
 .tech-track { user-select: none; -webkit-user-select: none; }
 .tech-track.is-dragging .tech-card { pointer-events: none; }
