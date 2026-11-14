@@ -454,7 +454,10 @@
         });
     });
 
-    /* Bandeau des technos : défilement manuel (molette, drag, clavier, flèches) */
+    /* Bandeau des technos : défilement automatique en continu.
+       Le contenu est dupliqué ×2 : on boucle après la largeur d'un groupe,
+       ce qui rend la boucle invisible. Le défilement se met en pause au
+       survol, au focus ou pendant une interaction, puis reprend tout seul. */
     (function () {
         var vp = $("[data-marquee]");
         if (!vp) return;
@@ -464,33 +467,38 @@
         var fadeL = $(".marquee__fade--l", vp);
         var fadeR = $(".marquee__fade--r", vp);
         var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+        var SPEED = 65; /* pixels par seconde */
         var paused = false;
+        var inView = !("IntersectionObserver" in window); /* rien tant que le bandeau n'est pas visible */
         var resumeTimer = null;
+        var acc = vp.scrollLeft || 0; /* position flottante : accumule les sous-pixels (Safari tronque scrollLeft) */
+        var span = 0;                 /* distance après laquelle on boucle */
+        var lastT = null;
+
+        /* largeur d'un groupe : le contenu étant dupliqué, boucler à cette distance est invisible */
+        function measure() {
+            var groups = $$(".marquee__group", track);
+            var groupW = 0;
+            if (groups.length >= 2) {
+                groupW = groups[1].offsetLeft - groups[0].offsetLeft;
+            } else if (track) {
+                groupW = track.scrollWidth / 2;
+            }
+            var maxScroll = Math.max(0, vp.scrollWidth - vp.clientWidth);
+            span = Math.max(0, Math.min(groupW, maxScroll));
+            if (acc >= span && span > 0) acc = acc % span;
+        }
+
+        function unpause() {
+            window.clearTimeout(resumeTimer);
+            acc = vp.scrollLeft; /* repartir de la position réelle après un geste manuel */
+            paused = false;
+        }
 
         /* reprise de l'animation automatique après un temps de latence */
         function resume(delay) {
             window.clearTimeout(resumeTimer);
-            resumeTimer = window.setTimeout(function () { paused = false; }, delay);
-        }
-
-        /* défilement continu, interrompu dès que l'utilisateur prend la main */
-        var looping = false;
-
-        function loop() {
-            if (looping) return;
-            looping = true;
-            tick();
-        }
-
-        function tick() {
-            if (!paused && !reduce.matches) {
-                if (vp.scrollLeft + vp.clientWidth >= vp.scrollWidth - 1) {
-                    vp.scrollLeft = 0;
-                } else {
-                    vp.scrollLeft += 0.55;
-                }
-            }
-            window.requestAnimationFrame(tick);
+            resumeTimer = window.setTimeout(unpause, delay);
         }
 
         function step() {
@@ -508,15 +516,18 @@
         }
 
         vp.addEventListener("scroll", sync, { passive: true });
-        window.addEventListener("resize", sync);
+        window.addEventListener("resize", function () { measure(); sync(); });
+        window.addEventListener("load", function () { measure(); sync(); });
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); sync(); });
+        measure();
         sync();
 
         /* pause de l'animation automatique au survol / au toucher / au clavier */
         vp.addEventListener("pointerenter", function () { paused = true; });
-        vp.addEventListener("pointerleave", function () { window.clearTimeout(resumeTimer); paused = false; });
+        vp.addEventListener("pointerleave", unpause);
         vp.addEventListener("focusin", function () { paused = true; });
-        vp.addEventListener("focusout", function () { paused = false; });
-        vp.addEventListener("pointerdown", function () { paused = true; });
+        vp.addEventListener("focusout", unpause);
+        vp.addEventListener("pointerdown", function () { paused = true; window.clearTimeout(resumeTimer); });
         vp.addEventListener("pointerup", function () { resume(5000); });
 
         function scrollByStep(dir) {
@@ -538,6 +549,8 @@
             e.preventDefault();
             paused = true;
             vp.scrollLeft = target;
+            acc = vp.scrollLeft;
+            resume(3000);
         }, { passive: false });
 
         /* glisser à la souris */
@@ -554,6 +567,7 @@
             var dx = e.clientX - startX;
             if (Math.abs(dx) > 3) vp.setPointerCapture && vp.setPointerCapture(e.pointerId);
             vp.scrollLeft = startScroll - dx;
+            acc = vp.scrollLeft;
         });
         ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
             vp.addEventListener(ev, function () {
@@ -576,16 +590,28 @@
             if (e.key === "End") { e.preventDefault(); jumpTo(vp.scrollWidth); }
         });
 
-        /* ne pas laisser le bandeau tourner inutilement hors écran */
+        /* boucle de défilement : vitesse constante (indépendante du taux d'images),
+           boucle invisible après la largeur d'un groupe */
+        function tick(t) {
+            if (lastT == null) lastT = t;
+            var dt = (t - lastT) / 1000;
+            lastT = t;
+            if (dt > 0.1) dt = 0.1; /* onglet en arrière-plan : ne pas téléporter le bandeau */
+            if (!paused && !reduce.matches && inView && span > 4) {
+                acc += SPEED * dt;
+                if (acc >= span) acc -= span;
+                vp.scrollLeft = acc;
+            }
+            window.requestAnimationFrame(tick);
+        }
+
+        /* ne pas laisser le bandeau défiler inutilement hors écran */
         if ("IntersectionObserver" in window) {
             new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) window.requestAnimationFrame(loop);
-                });
+                entries.forEach(function (entry) { inView = entry.isIntersecting; });
             }, { threshold: 0 }).observe(vp);
-        } else {
-            window.requestAnimationFrame(loop);
         }
+        window.requestAnimationFrame(tick);
     })();
 
     /* Défilement doux pour les ancres (compatibilité navigateurs anciens) */
