@@ -469,7 +469,7 @@
         var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
         var STEP = 6.5;           /* pixels par pas : 65 px/s avec un intervalle de 0,10 s */
         var paused = false;
-        var inView = !("IntersectionObserver" in window); /* rien tant que le bandeau n'est pas visible */
+        var inView = true; /* défilement actif par défaut ; l'observateur met en pause hors écran quand il fonctionne */
         var resumeTimer = null;
         var acc = vp.scrollLeft || 0; /* position flottante : accumule les sous-pixels (Safari tronque scrollLeft) */
         var span = 0;                 /* distance après laquelle on boucle */
