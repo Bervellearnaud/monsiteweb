@@ -688,73 +688,33 @@
 
 <!-- ====================== INFRASTRUCTURE ====================== -->
 <section class="section section--tint" id="infrastructure">
-    <div class="wrap split">
-        <div class="panel" data-reveal style="order:2">
-            <div class="panel__head">
-                <strong>Infrastructure du site / bureau</strong>
-                <span><i></i> Opérationnel</span>
-            </div>
-            <div style="display:grid;gap:.55rem">
-                <div class="method" style="padding:.7rem .8rem">
-                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-dish"/></svg></span>
-                    <span><small>Liaison satellite</small><strong>Starlink installé &amp; configuré</strong></span>
-                    <span class="chip" style="margin-left:auto">OK</span>
-                </div>
-                <div class="method" style="padding:.7rem .8rem">
-                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-globe"/></svg></span>
-                    <span><small>Accès internet</small><strong>Fibre + secours 4G</strong></span>
-                    <span class="chip" style="margin-left:auto">OK</span>
-                </div>
-                <div class="method" style="padding:.7rem .8rem">
-                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-network"/></svg></span>
-                    <span><small>Réseau local</small><strong>VLAN direction · bureau · Wi-Fi invités</strong></span>
-                    <span class="chip" style="margin-left:auto">OK</span>
-                </div>
-                <div class="method" style="padding:.7rem .8rem">
-                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-server"/></svg></span>
-                    <span><small>Windows Server</small><strong>AD DS · DNS · DHCP · GPO · partages</strong></span>
-                    <span class="chip" style="margin-left:auto">OK</span>
-                </div>
-                <div class="method" style="padding:.7rem .8rem">
-                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-shield"/></svg></span>
-                    <span><small>Sauvegardes</small><strong>Quotidiennes, testées, externalisées</strong></span>
-                    <span class="chip" style="margin-left:auto">OK</span>
-                </div>
-                <div class="method" style="padding:.7rem .8rem">
-                    <span class="method__ico"><svg aria-hidden="true"><use href="#i-camera"/></svg></span>
-                    <span><small>Vidéosurveillance</small><strong>8 caméras IP · NVR · accès mobile</strong></span>
-                    <span class="chip" style="margin-left:auto">OK</span>
-                </div>
-            </div>
-        </div>
-
-        <div style="order:1">
-            <span class="eyebrow" data-reveal><i class="eyebrow__dot"></i> Infrastructure &amp; sécurité</span>
-            <h2 class="h-sec" style="margin:1rem 0 1.1rem" data-reveal>
-                Un site rapide a besoin<br><span class="grad-text">d'un réseau solide.</span>
-            </h2>
-            <p class="lede" data-reveal>
+    <div class="wrap">
+        <div class="sec-head sec-head--center" data-reveal>
+            <span class="eyebrow"><i class="eyebrow__dot"></i> Infrastructure &amp; sécurité</span>
+            <h2 class="h-sec">Un site rapide a besoin<br><span class="grad-text">d'un réseau solide.</span></h2>
+            <p class="lede">
                 Nous intervenons aussi sur le terrain : là où sont vos postes, votre serveur et vos caméras.
                 Que votre réseau existe déjà ou qu'il soit à créer, nous le concevons, le sécurisons et le documentons.
             </p>
-            <ul class="checks" data-reveal style="--d:80ms">
-                <li>
-                    <svg aria-hidden="true"><use href="#i-check"/></svg>
-                    <span><strong>Améliorer un réseau existant</strong><span>Audit, suppression des points faibles, segmentation, Wi-Fi couvrant, débit et stabilité.</span></span>
-                </li>
-                <li>
-                    <svg aria-hidden="true"><use href="#i-check"/></svg>
-                    <span><strong>Mettre en place un nouveau réseau</strong><span>Étude, câblage, baie de brassage, switchs, adressage IP, partages et accès à distance.</span></span>
-                </li>
-                <li>
-                    <svg aria-hidden="true"><use href="#i-check"/></svg>
-                    <span><strong>Windows Server</strong><span>Installation, domaine Active Directory, comptes et droits, stratégies de groupe, impression, sauvegardes.</span></span>
-                </li>
-                <li>
-                    <svg aria-hidden="true"><use href="#i-check"/></svg>
-                    <span><strong>Vidéosurveillance</strong><span>Choix et pose des caméras IP, configuration du NVR, consultation sécurisée depuis le téléphone.</span></span>
-                </li>
-            </ul>
+        </div>
+
+        <div class="checks checks--grid" data-reveal style="--d:80ms">
+            <div class="checks__card">
+                <svg aria-hidden="true"><use href="#i-network"/></svg>
+                <span><strong>Améliorer un réseau existant</strong><span>Audit, suppression des points faibles, segmentation, Wi-Fi couvrant, débit et stabilité.</span></span>
+            </div>
+            <div class="checks__card">
+                <svg aria-hidden="true"><use href="#i-globe"/></svg>
+                <span><strong>Mettre en place un nouveau réseau</strong><span>Étude, câblage, baie de brassage, switchs, adressage IP, partages et accès à distance.</span></span>
+            </div>
+            <div class="checks__card">
+                <svg aria-hidden="true"><use href="#i-server"/></svg>
+                <span><strong>Windows Server</strong><span>Installation, domaine Active Directory, comptes et droits, stratégies de groupe, impression, sauvegardes.</span></span>
+            </div>
+            <div class="checks__card">
+                <svg aria-hidden="true"><use href="#i-camera"/></svg>
+                <span><strong>Vidéosurveillance</strong><span>Choix et pose des caméras IP, configuration du NVR, consultation sécurisée depuis le téléphone.</span></span>
+            </div>
         </div>
     </div>
 </section>
