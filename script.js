@@ -13,8 +13,9 @@
        vers un e-mail pré-rempli (aucun lien cassé).
        ---------------------------------------------------------------------- */
     var CONFIG = {
-        WHATSAPP_NUMBER: "",                       // ex. "2250700000000"
-        EMAIL: "contact@techzen.ci",
+        WHATSAPP_NUMBER: "2250714232871",          // +225 07 14 23 28 71
+        WHATSAPP_DISPLAY: "+225 07 14 23 28 71",
+        EMAIL: "techzenc@techzen.ci",
         BRAND: "TechZen"
     };
 
