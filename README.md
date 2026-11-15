@@ -95,7 +95,7 @@ offre, réassurance, action.
 | Projets | Filtres Web / Applications / Jeux, vignettes, lightbox clavier et tactile |
 | Carrousel technos | Avance automatique (2,6 s d'arrêt par carte + 0,6 s de transition, retour au début en fin de liste), pause au survol / focus / molette / glisser, bouton pause-lecture, alignement par carte (`scroll-snap`), compteur et barre de progression |
 | FAQ | Accordéon natif (`details` / `summary`), une réponse ouverte à la fois |
-| Formulaire | Validation navigateur, ouverture d'un message WhatsApp pré-rempli |
+| Formulaire | Validation navigateur, normalisation du téléphone, message WhatsApp pré-rempli, lien de secours si l'onglet est bloqué |
 | WhatsApp | Tous les CTA basculent vers un e-mail pré-rempli tant que `WHATSAPP_NUMBER` est vide |
 | Lightbox | Navigation Précédent / Suivant, fermeture au clavier et au clic sur le fond |
 
@@ -129,6 +129,27 @@ Ces coordonnées sont reprises à trois endroits, à garder alignés :
   pour les visiteurs sans JavaScript).
 - **Marque** : `BRAND` est disponible pour les évolutions JS ; le texte visible est
   principalement dans `index.html`.
+
+### Formulaire de contact
+
+Le formulaire n'envoie rien à un serveur : il **prépare** un message et l'ouvre
+dans WhatsApp (ou dans le client de messagerie si `WHATSAPP_NUMBER` est vide).
+
+- **Téléphone** : `07 14 23 28 71`, `0714232871`, `+225 07 14 23 28 71` et
+  `002250714232871` sont tous normalisés en `+225 07 14 23 28 71`. En Côte
+  d'Ivoire le `0` initial fait partie du numéro international, il n'est donc
+  jamais retiré. Un numéro étranger est accepté s'il porte son indicatif
+  (`+221`, `+33`…) et garde la mise en forme tapée.
+- **Objet** : `wa.me` ne transporte pas d'objet, il est donc placé en tête du
+  message (`[Site] <besoin> — <nom>`) pour trier les demandes dans WhatsApp.
+- **Onglet bloqué** : si `window.open` est refusé (bloqueur de pop-up, mode
+  PWA), un lien de secours cliquable s'affiche dans le message de confirmation.
+- **Second canal** : un lien « Pas de WhatsApp ? Écrivez-nous par e-mail » est
+  toujours visible sous le bouton.
+
+> Pour recevoir les demandes **par e-mail** (et non par WhatsApp), il faut un
+> service côté serveur : Formspree, Web3Forms, Netlify Forms ou une fonction
+> Netlify. Voir la section « Recevoir les demandes par e-mail » du README.
 
 ### Couleurs et design tokens
 
@@ -171,6 +192,59 @@ Les contenus sont volontairement écrits en clair dans `index.html` :
 - balises Open Graph, Twitter Card, description et auteur ;
 - thème sombre sans flash via préférence système et `localStorage` ;
 - poids HTML/CSS/JS contenu, adapté à un hébergement statique économique.
+
+## Recevoir les demandes par e-mail
+
+Le site est **statique** : un formulaire HTML seul ne peut pas envoyer d'e-mail.
+Aujourd'hui, il prépare un message WhatsApp (ou un `mailto:`), que le visiteur
+envoie lui-même. Pour recevoir les demandes **dans une boîte mail**
+`techzenc@techzen.ci`, il faut brancher un service — trois options, du plus
+simple au plus complet.
+
+### 1. Netlify Forms (le plus rapide si le site est sur Netlify)
+
+```html
+<form class="form" id="projectForm" name="projet" method="POST" data-netlify="true">
+  <input type="hidden" name="form-name" value="projet">
+  …
+</form>
+```
+
+Netlify détecte le formulaire au déploiement, stocke les envois dans le
+tableau de bord et prévient par e-mail (`Site settings → Forms → Form
+notifications`). Pas de JS supplémentaire : il suffit de retirer
+`e.preventDefault()` du gestionnaire de soumission.
+
+### 2. Web3Forms / Formspree (aucun hébergeur particulier)
+
+```html
+<form action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="VOTRE_CLE">
+  <input type="hidden" name="subject" value="Nouvelle demande — TechZen">
+  <input type="hidden" name="redirect" value="https://techzen.ci/merci.html">
+  …
+</form>
+```
+
+Chaque service fournit une clé liée à l'adresse de réception ; le quota gratuit
+couvre largement un site vitrine (≈ 50 à 250 messages par mois).
+
+### 3. Fonction Netlify + Resend (contrôle total)
+
+Une fonction serveur reçoit le `POST`, valide les champs puis envoie l'e-mail
+via l'API Resend avec le domaine `techzen.ci`. C'est la seule option qui permet
+un vrai accusé de réception automatique au visiteur.
+
+### Ce qu'il faudra modifier dans le code
+
+| Fichier | Changement |
+| --- | --- |
+| `index.html` | `action` / `method` du formulaire, champs cachés du service, page de remerciement |
+| `script.js` | section 7 : remplacer `window.open(wa.me…)` par un `fetch` vers le service (garder la validation et la normalisation du téléphone) |
+| DNS du domaine | enregistrements SPF/DKIM si l'envoi se fait depuis `techzen.ci` (option 3) |
+
+Tant que ce branchement n'est pas fait, **aucune demande n'arrive par e-mail** :
+elle arrive sur WhatsApp au `+225 07 14 23 28 71`.
 
 ## Déploiement
 

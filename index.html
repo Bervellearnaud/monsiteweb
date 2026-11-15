@@ -1165,7 +1165,10 @@
                     </div>
                     <div class="field">
                         <label for="f-phone">Téléphone / WhatsApp</label>
-                        <input id="f-phone" name="phone" type="tel" placeholder="+225 07 00 00 00 00" autocomplete="tel">
+                        <input id="f-phone" name="phone" type="tel" inputmode="tel"
+                               placeholder="+225 07 00 00 00 00" autocomplete="tel"
+                               aria-describedby="f-phone-help">
+                        <span class="field__help" id="f-phone-help">Avec l'indicatif, ou 10 chiffres — on vous rappelle sur WhatsApp.</span>
                     </div>
                 </div>
                 <div class="field">
@@ -1186,13 +1189,20 @@
                     <label for="f-msg">Votre projet</label>
                     <textarea id="f-msg" name="message" placeholder="Dites-nous en quelques mots ce que vous souhaitez accomplir." required></textarea>
                 </div>
-                <button class="btn btn--primary btn--block btn--lg" type="submit">
-                    Envoyer ma demande
-                    <svg aria-hidden="true"><use href="#i-arrow-r"/></svg>
+                <button class="btn btn--wa btn--block btn--lg" type="submit">
+                    <svg aria-hidden="true"><use href="#i-whatsapp"/></svg> Envoyer sur WhatsApp
                 </button>
+                <p class="form__dest">
+                    Votre demande part sur <strong>WhatsApp</strong>, au
+                    <a href="tel:+2250714232871">+225 07 14 23 28 71</a>.
+                </p>
+                <a class="form__alt" href="mailto:techzenc@techzen.ci?subject=Demande%20de%20projet%20-%20TechZen">
+                    <svg aria-hidden="true"><use href="#i-mail"/></svg>
+                    Pas de WhatsApp ? Écrivez-nous par e-mail
+                </a>
                 <p class="form__status" id="formStatus" role="status"></p>
                 <p class="form__note">
-                    En envoyant, votre message s'ouvre pré-rempli dans WhatsApp. Aucune donnée n'est stockée sur ce site.
+                    Aucune donnée n'est stockée sur ce site : le message est simplement pré-rempli dans votre application.
                 </p>
             </form>
         </div>
