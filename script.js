@@ -248,13 +248,111 @@
     var form = $("#projectForm");
     var statusEl = $("#formStatus");
 
+    /* Indicatifs acceptés quand le visiteur écrit un numéro local (10 chiffres
+       pour la Côte d'Ivoire). Volontairement court : mieux vaut recopier le
+       numéro tel quel que le réécrire de travers. */
+    var DIAL_CODES = {
+        "225": "Côte d'Ivoire", "226": "Burkina Faso", "221": "Sénégal",
+        "228": "Togo", "229": "Bénin", "223": "Mali", "224": "Guinée",
+        "227": "Niger", "237": "Cameroun", "33": "France", "32": "Belgique",
+        "41": "Suisse", "1": "Canada / États-Unis", "44": "Royaume-Uni"
+    };
+    var DEFAULT_CODE = "225";
+
+    /* « 07 14 23 28 71 », « 0714232871 » et « +225 07 14 23 28 71 » donnent tous
+       « +225 07 14 23 28 71 ». En Côte d'Ivoire le 0 initial fait partie du
+       numéro international : on ne le retire pas. Un numéro étranger garde la
+       mise en forme tapée par le visiteur. */
+    function normalizePhone(raw) {
+        var value = (raw || "").trim();
+        if (!value) return { ok: true, display: "", intl: "", country: "" };
+
+        var explicit = value.charAt(0) === "+" || value.indexOf("00") === 0;
+        var digits = value.replace(/[^\d]/g, "");
+        if (explicit && value.indexOf("00") === 0 && value.charAt(0) !== "+") digits = digits.slice(2);
+        if (!digits) return { ok: false, reason: "aucun chiffre" };
+        if (digits.length < 7) return { ok: false, reason: "numéro trop court" };
+
+        var code = "", rest = "", local = digits;
+
+        if (explicit) {
+            for (var i = 3; i >= 1; i--) {
+                if (DIAL_CODES[digits.slice(0, i)]) { code = digits.slice(0, i); break; }
+            }
+            if (!code) return { ok: false, reason: "indicatif non reconnu" };
+            rest = digits.slice(code.length);
+            local = rest;
+        } else if (digits.length === 10) {
+            code = DEFAULT_CODE;                 /* 07 14 23 28 71 : le 0 reste */
+            rest = digits;
+        } else if (digits.length > 10) {
+            for (var j = 3; j >= 1; j--) {
+                if (DIAL_CODES[digits.slice(0, j)]) { code = digits.slice(0, j); break; }
+            }
+            if (!code) return { ok: false, reason: "indicatif non reconnu" };
+            rest = digits.slice(code.length);
+            local = rest;
+        } else {
+            return { ok: false, reason: "indicatif pays manquant" };
+        }
+
+        if (rest.length < 6) return { ok: false, reason: "numéro trop court" };
+
+        /* Le visiteur a déjà espacé son numéro : on respecte sa présentation.
+           Sinon on groupe par paires, plus lisible qu'une suite de chiffres. */
+        var display;
+        if (/[\s.\-()]/.test(value)) {
+            var typed = value.replace(/^00/, "").replace(/\(0\)/g, "").replace(/\s+/g, " ").trim();
+            if (!explicit) display = "+" + code + " " + typed;
+            else display = typed.charAt(0) === "+" ? typed : "+" + typed;
+        } else {
+            display = "+" + code + " " + (local.match(/.{1,2}/g) || []).join(" ");
+        }
+
+        return {
+            ok: true,
+            intl: "+" + code + rest,
+            display: display,
+            country: DIAL_CODES[code] || ""
+        };
+    }
+
+    /* Premier prénom utilisable dans une phrase (on ne garde rien qui casse
+       la mise en forme du message). */
+    function firstName(full) {
+        var first = (full || "").trim().split(/\s+/)[0] || "";
+        return first.replace(/[^\p{L}\p{M}'-]/gu, "");
+    }
+
     if (form) {
+        var phoneInput = $("#f-phone");
+
+        /* À la sortie du champ, on montre le numéro tel qu'il sera transmis. */
+        if (phoneInput) {
+            phoneInput.addEventListener("blur", function () {
+                var res = normalizePhone(phoneInput.value);
+                if (!phoneInput.value.trim()) {
+                    phoneInput.removeAttribute("aria-invalid");
+                    return;
+                }
+                if (res.ok) {
+                    phoneInput.value = res.display;
+                    phoneInput.removeAttribute("aria-invalid");
+                } else {
+                    phoneInput.setAttribute("aria-invalid", "true");
+                }
+            });
+            phoneInput.addEventListener("input", function () {
+                phoneInput.removeAttribute("aria-invalid");
+            });
+        }
+
         form.addEventListener("submit", function (e) {
             e.preventDefault();
 
             var name = ($("#f-name") || {}).value || "";
             var email = ($("#f-email") || {}).value || "";
-            var phone = ($("#f-phone") || {}).value || "";
+            var phoneRaw = ($("#f-phone") || {}).value || "";
             var need = ($("#f-need") || {}).value || "";
             var message = ($("#f-msg") || {}).value || "";
 
@@ -263,14 +361,27 @@
             if (!email.trim() || email.indexOf("@") === -1) missing.push("un e-mail valide");
             if (!message.trim()) missing.push("quelques mots sur votre projet");
 
-            if (missing.length) {
-                if (statusEl) {
-                    statusEl.textContent = "Merci de compléter : " + missing.join(", ") + ".";
-                    statusEl.classList.add("is-on");
+            var phone = normalizePhone(phoneRaw);
+            if (phoneRaw.trim() && !phone.ok) missing.push("un téléphone valide — " + phone.reason);
+
+            function showStatus(text, isError, extra) {
+                if (!statusEl) return;
+                statusEl.textContent = text;
+                statusEl.classList.remove("is-on");
+                void statusEl.offsetWidth;
+                statusEl.classList.add("is-on");
+                if (isError) {
                     statusEl.style.background = "rgba(200, 60, 60, .10)";
                     statusEl.style.color = "#b42318";
                     statusEl.style.borderColor = "rgba(200, 60, 60, .25)";
+                } else {
+                    statusEl.removeAttribute("style");
                 }
+                if (extra) statusEl.appendChild(extra);
+            }
+
+            if (missing.length) {
+                showStatus("Merci de compléter : " + missing.join(", ") + ".", true);
                 return;
             }
 
@@ -278,25 +389,47 @@
                 "Bonjour " + CONFIG.BRAND + ",\n\n" +
                 "Nom : " + name.trim() + "\n" +
                 "E-mail : " + email.trim() + "\n" +
-                (phone.trim() ? "Téléphone / WhatsApp : " + phone.trim() + "\n" : "") +
+                (phone.display ? "Téléphone / WhatsApp : " + phone.display + "\n" : "") +
                 "Besoin : " + need + "\n\n" +
                 "Projet :\n" + message.trim() + "\n\n" +
                 "— Envoyé depuis la page d'accueil de " + CONFIG.BRAND;
 
-            var url = linkForWhatsApp(text, "Demande de projet — " + need + " (" + name.trim() + ")");
+            /* L'objet n'est pas transmis par wa.me : on le place donc en tête du
+               message pour retrouver la demande d'un coup d'œil dans WhatsApp. */
+            var subject = "[Site] " + need + " — " + name.trim();
+            var full = subject + "\n\n" + text;
 
-            if (statusEl) {
-                statusEl.textContent = CONFIG.WHATSAPP_NUMBER
-                    ? "Merci " + name.trim().split(" ")[0] + " ! Votre message s'ouvre dans WhatsApp."
-                    : "Merci " + name.trim().split(" ")[0] + " ! Votre message s'ouvre dans votre logiciel de messagerie.";
-                statusEl.classList.remove("is-on");
-                void statusEl.offsetWidth;
-                statusEl.classList.add("is-on");
-                statusEl.removeAttribute("style");
+            var url = linkForWhatsApp(full, "Demande de projet — " + need + " (" + name.trim() + ")");
+            var hello = firstName(name) ? "Merci " + firstName(name) + " ! " : "Merci ! ";
+            var isWhatsApp = !!buildWhatsAppURL("");
+            var target = isWhatsApp ? CONFIG.WHATSAPP_DISPLAY : CONFIG.EMAIL;
+
+            var opened = null;
+            try {
+                opened = window.open(url, "_blank", "noopener");
+            } catch (err) {
+                opened = null;
             }
 
-            window.open(url, "_blank", "noopener");
+            /* Onglet bloqué (mode PWA, iOS strict, bloqueur de pop-up) : on
+               propose le lien à cliquer plutôt qu'une confirmation mensongère. */
+            if (opened) {
+                showStatus(hello + (isWhatsApp
+                    ? "votre message s'ouvre dans WhatsApp au " + target + "."
+                    : "votre message s'ouvre dans votre logiciel de messagerie."));
+            } else {
+                var link = document.createElement("a");
+                link.href = url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.className = "form__status-link";
+                link.textContent = isWhatsApp ? "Ouvrir WhatsApp" : "Ouvrir l'e-mail";
+                showStatus(hello + "votre navigateur a bloqué l'ouverture — cliquez ici pour envoyer : ", false);
+                statusEl.appendChild(link);
+            }
+
             form.reset();
+            if (phoneInput) phoneInput.removeAttribute("aria-invalid");
         });
     }
 

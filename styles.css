@@ -2500,6 +2500,38 @@ html[data-theme="dark"] .method__ico { color: var(--brand-soft); }
 
 .form__note { font-size: .74rem; color: var(--muted); text-align: center; }
 
+/* Où part la demande + second canal : le visiteur doit savoir avant de cliquer. */
+.form__dest {
+    margin-top: .1rem;
+    font-size: .78rem;
+    line-height: 1.5;
+    color: var(--muted);
+    text-align: center;
+}
+
+.form__dest strong { color: var(--ink); font-weight: 600; }
+.form__dest a { color: var(--brand-strong); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+.form__alt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    margin-inline: auto;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+}
+
+.form__alt:hover { color: var(--brand-strong); text-decoration-color: currentColor; }
+.form__alt svg { width: 15px; height: 15px; }
+
+.field__help { font-size: .72rem; line-height: 1.45; color: var(--muted); }
+.field input[aria-invalid="true"] { border-color: #b42318; box-shadow: 0 0 0 3px rgba(180, 35, 24, .12); }
+
 .form__status {
     font-size: .82rem;
     padding: .6rem .8rem;
@@ -2511,6 +2543,16 @@ html[data-theme="dark"] .method__ico { color: var(--brand-soft); }
 }
 
 .form__status.is-on { display: block; }
+
+/* Repli quand le navigateur bloque l'ouverture d'un onglet. */
+.form__status-link {
+    display: inline-block;
+    margin-left: .15rem;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
 html[data-theme="dark"] .form__status { color: #63d99b; }
 
 /* --------------------------------------------------------------------------
