@@ -109,7 +109,7 @@ Le haut de `script.js` centralise la configuration :
 var CONFIG = {
     WHATSAPP_NUMBER: "2250714232871",           // +225 07 14 23 28 71
     WHATSAPP_DISPLAY: "+225 07 14 23 28 71",    // forme lisible sur le site
-    EMAIL: "techzenc@techzen.ci",
+    EMAIL: "mysupport@techzen.ci",
     BRAND: "TechZen"
 };
 ```
@@ -119,6 +119,7 @@ Ces coordonnées sont reprises à trois endroits, à garder alignés :
 | Où | Quoi |
 | --- | --- |
 | `index.html` — section `#contact` | e-mail, numéro affiché, lien `tel:+2250714232871` |
+| `config.example.php` | adresse de réception et expéditeur SMTP |
 | `index.html` — pied de page | e-mail et numéro cliquables |
 | `index.html` — données structurées `ld+json` | `telephone`, `email`, `contactPoint` |
 
@@ -193,70 +194,123 @@ Les contenus sont volontairement écrits en clair dans `index.html` :
 - thème sombre sans flash via préférence système et `localStorage` ;
 - poids HTML/CSS/JS contenu, adapté à un hébergement statique économique.
 
-## Recevoir les demandes par e-mail
+## Formulaire : envoi par e-mail (PHP + SMTP)
 
-Le site est **statique** : un formulaire HTML seul ne peut pas envoyer d'e-mail.
-Aujourd'hui, il prépare un message WhatsApp (ou un `mailto:`), que le visiteur
-envoie lui-même. Pour recevoir les demandes **dans une boîte mail**
-`techzenc@techzen.ci`, il faut brancher un service — trois options, du plus
-simple au plus complet.
+Le formulaire envoie désormais réellement un e-mail : `contact.php` reçoit le
+`POST`, valide les champs et expédie le message par **SMTP authentifié** sur la
+boîte de l'hébergement. WhatsApp reste proposé juste sous le bouton, pour qui
+préfère discuter tout de suite.
 
-### 1. Netlify Forms (le plus rapide si le site est sur Netlify)
-
-```html
-<form class="form" id="projectForm" name="projet" method="POST" data-netlify="true">
-  <input type="hidden" name="form-name" value="projet">
-  …
-</form>
+```
+index.html ──fetch──▶ contact.php ──SMTP──▶ mysupport@techzen.ci
+                                   └─accusé──▶ adresse du visiteur
 ```
 
-Netlify détecte le formulaire au déploiement, stocke les envois dans le
-tableau de bord et prévient par e-mail (`Site settings → Forms → Form
-notifications`). Pas de JS supplémentaire : il suffit de retirer
-`e.preventDefault()` du gestionnaire de soumission.
+### 1. Créer `config.php` sur le serveur
 
-### 2. Web3Forms / Formspree (aucun hébergeur particulier)
+`config.example.php` est le modèle. **Il ne contient aucun secret et peut être
+versionné** ; `config.php`, lui, porte le mot de passe SMTP et est ignoré par
+Git.
 
-```html
-<form action="https://api.web3forms.com/submit" method="POST">
-  <input type="hidden" name="access_key" value="VOTRE_CLE">
-  <input type="hidden" name="subject" value="Nouvelle demande — TechZen">
-  <input type="hidden" name="redirect" value="https://techzen.ci/merci.html">
-  …
-</form>
+```bash
+# sur le serveur, dans le dossier du site
+cp config.example.php config.php
 ```
 
-Chaque service fournit une clé liée à l'adresse de réception ; le quota gratuit
-couvre largement un site vitrine (≈ 50 à 250 messages par mois).
+Puis renseignez au minimum :
 
-### 3. Fonction Netlify + Resend (contrôle total)
-
-Une fonction serveur reçoit le `POST`, valide les champs puis envoie l'e-mail
-via l'API Resend avec le domaine `techzen.ci`. C'est la seule option qui permet
-un vrai accusé de réception automatique au visiteur.
-
-### Ce qu'il faudra modifier dans le code
-
-| Fichier | Changement |
+| Clé | Valeur attendue |
 | --- | --- |
-| `index.html` | `action` / `method` du formulaire, champs cachés du service, page de remerciement |
-| `script.js` | section 7 : remplacer `window.open(wa.me…)` par un `fetch` vers le service (garder la validation et la normalisation du téléphone) |
-| DNS du domaine | enregistrements SPF/DKIM si l'envoi se fait depuis `techzen.ci` (option 3) |
+| `smtp_host` | `mail.techzen.ci` (cPanel : `mail.<domaine>`) |
+| `smtp_port` | `465` (SSL) ou `587` (STARTTLS) |
+| `smtp_secure` | `'ssl'` ou `'tls'` |
+| `smtp_user` | `mysupport@techzen.ci` |
+| `smtp_pass` | **le mot de passe de la boîte** (jamais dans Git) |
+| `to_email` | `mysupport@techzen.ci` |
+| `from_email` | impérativement la boîte authentifiée, sinon SPF/DKIM casse |
 
-Tant que ce branchement n'est pas fait, **aucune demande n'arrive par e-mail** :
-elle arrive sur WhatsApp au `+225 07 14 23 28 71`.
+### 2. Vérifier la configuration
+
+Ouvrez `https://techzen.ci/contact.php?ping=1` : la réponse indique si
+`config.php` est présent, l'hôte SMTP, et si le mot de passe est renseigné —
+**sans jamais l'afficher**. Exemple :
+
+```json
+{ "config_present": true, "smtp_host": "mail.techzen.ci",
+  "smtp_pass_set": true, "php_version": "8.2.x", "openssl": true }
+```
+
+### 3. Tester un envoi
+
+Remplissez le formulaire du site : vous devez recevoir la demande sur
+`mysupport@techzen.ci`, et le visiteur un accusé de réception. En cas d'échec :
+
+- `contact.log` (à la racine, non servi par Apache) contient la raison exacte :
+  authentification refusée, port fermé, message rejeté ;
+- le formulaire propose alors **un lien WhatsApp** au visiteur, avec le même
+  contenu — aucune demande n'est perdue.
+
+### 4. Comportement
+
+| Situation | Résultat |
+| --- | --- |
+| Envoi réussi | confirmation « Votre demande est bien envoyée » + accusé au visiteur |
+| Champ invalide (serveur) | champ marqué, message explicite, pas de bascule |
+| SMTP en panne / mal configuré | lien WhatsApp de secours, raison affichée |
+| Réseau coupé, ou site ouvert sans PHP | lien WhatsApp de secours |
+| Robot (champ piège, envoi < 3 s) | réponse neutre, rien n'est expédié |
+| Plus de 5 envois/heure par IP | message d'attente, WhatsApp proposé |
+
+### 5. Sécurité
+
+- `.htaccess` interdit l'accès à `config.php`, `config.example.php` et
+  `contact.log` ;
+- toutes les valeurs affichées dans le mail sont nettoyées (pas d'injection
+  d'en-têtes : retours à la ligne retirés) ;
+- l'e-mail du visiteur part en `Reply-To` : vous répondez directement à la
+  bonne personne ;
+- les messages ne sont ni stockés ni relus par le site : ils partent
+  immédiatement, l'accusé de réception compris ;
+- limite de 5 envois par heure et par IP, journalisée sur le serveur.
+
+### 6. Sans hébergement PHP
+
+Si le site est ouvert depuis un simple serveur statique (aperçu local, Netlify,
+GitHub Pages), `contact.php` n'est pas exécuté : le formulaire le détecte et
+bascule automatiquement sur WhatsApp. Pour un envoi par e-mail sans PHP, il
+faudrait un service tiers (Formspree, Web3Forms) branché sur l'attribut
+`action`.
 
 ## Déploiement
 
-Le site est statique et ne nécessite ni Node ni serveur applicatif.
+Le site est statique, à l'exception du formulaire (`contact.php`, PHP + SMTP).
 
-- **Netlify / Vercel** : brancher le dépôt, racine `/`, aucune commande de build.
-- **GitHub Pages** : publier la racine de `main`.
-- **Hébergement classique** : copier le contenu du dépôt sur Apache, Nginx ou un
-  espace fichiers mutualisé.
+### Hébergement actuel : cPanel (TPEcloud) sur techzen.ci
 
-Pensez à servir `index.html`, `styles.css`, `script.js`, `manifest.webmanifest`,
-`assets/` et `demo/` avec les chemins relatifs intacts.
+1. Téléverser à la racine publique (`public_html`) : `index.html`, `styles.css`,
+   `script.js`, `manifest.webmanifest`, `favicon.png`, `assets/`, `demo/`,
+   `contact.php`, `config.example.php` et `.htaccess`.
+2. Créer `config.php` **sur le serveur** (jamais dans le dépôt) et y mettre le
+   mot de passe de `mysupport@techzen.ci`.
+3. Vérifier PHP 8.x dans « Select PHP Version » (extensions `openssl` et
+   `mbstring` recommandées).
+4. Contrôler `https://techzen.ci/contact.php?ping=1`, puis envoyer une demande
+   de test.
+5. Dans « Email Deliverability », vérifier SPF et DKIM : sans eux, les mails
+   peuvent tomber en spam.
+
+⚠️ `techzenc@techzen.ci` est un compte **système** et le plan ne prévoit
+qu'une boîte : c'est `mysupport@techzen.ci` qui reçoit et expédie. L'adresse
+affichée partout sur le site est donc `mysupport@techzen.ci`.
+
+### Autres hébergements
+
+- **Netlify / Vercel** : brancher le dépôt, racine `/`, aucune commande de
+  build. PHP n'y tourne pas : le formulaire bascule sur WhatsApp.
+- **GitHub Pages** : publier la racine de `main`, même remarque.
+- Pensez à servir `index.html`, `styles.css`, `script.js`,
+  `manifest.webmanifest`, `assets/` et `demo/` avec les chemins relatifs
+  intacts.
 
 ## Réalisations présentées
 

@@ -2528,6 +2528,33 @@ html[data-theme="dark"] .method__ico { color: var(--brand-soft); }
 
 .form__alt:hover { color: var(--brand-strong); text-decoration-color: currentColor; }
 .form__alt svg { width: 15px; height: 15px; }
+.form__alt--wa { color: #14824a; }
+.form__alt--wa:hover { color: #0d6b3b; }
+
+/* Champ piège anti-spam : hors écran, jamais lisible ni focusable. */
+.field--trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Envoi en cours : le bouton ne doit pas pouvoir être cliqué deux fois. */
+.btn[aria-busy="true"] { opacity: .72; pointer-events: none; }
+.btn[aria-busy="true"] .spin {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .btn[aria-busy="true"] .spin { animation-duration: 2.4s; }
+}
 
 .field__help { font-size: .72rem; line-height: 1.45; color: var(--muted); }
 .field input[aria-invalid="true"] { border-color: #b42318; box-shadow: 0 0 0 3px rgba(180, 35, 24, .12); }

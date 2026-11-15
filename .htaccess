@@ -1,0 +1,36 @@
+# ==========================================================================
+# TechZen — protection des fichiers sensibles
+# Hébergement Apache (cPanel / TPEcloud). Si votre serveur est en Nginx,
+# configurez l'équivalent dans le panneau : ces règles ne sont pas lues.
+# ==========================================================================
+
+# Le mot de passe SMTP et les journaux ne doivent jamais être servis.
+<FilesMatch "^(config\.php|config\.example\.php|contact\.log)$">
+    Require all denied
+</FilesMatch>
+
+# Pas de listing des dossiers.
+Options -Indexes
+
+# En-têtes de sécurité utiles (sans casser le fonctionnement du site).
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Compression des fichiers texte.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# Cache long pour les images et polices, court pour le code.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/webp  "access plus 1 year"
+    ExpiresByType image/png   "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css    "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType text/html   "access plus 1 hour"
+</IfModule>

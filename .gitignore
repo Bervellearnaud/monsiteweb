@@ -4,3 +4,7 @@
 node_modules/
 .DS_Store
 .preview_look/
+
+# Secrets du formulaire (mot de passe SMTP) et journaux serveur
+config.php
+contact.log

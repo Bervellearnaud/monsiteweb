@@ -15,7 +15,7 @@
     var CONFIG = {
         WHATSAPP_NUMBER: "2250714232871",          // +225 07 14 23 28 71
         WHATSAPP_DISPLAY: "+225 07 14 23 28 71",
-        EMAIL: "techzenc@techzen.ci",
+        EMAIL: "mysupport@techzen.ci",
         BRAND: "TechZen"
     };
 
@@ -326,6 +326,9 @@
 
     if (form) {
         var phoneInput = $("#f-phone");
+        var startedInput = $("#f-started");
+        if (startedInput) startedInput.value = Date.now();
+
 
         /* À la sortie du champ, on montre le numéro tel qu'il sera transmis. */
         if (phoneInput) {
@@ -385,6 +388,7 @@
                 return;
             }
 
+            /* Message WhatsApp de secours : même contenu, si l'e-mail échoue. */
             var text =
                 "Bonjour " + CONFIG.BRAND + ",\n\n" +
                 "Nom : " + name.trim() + "\n" +
@@ -394,42 +398,98 @@
                 "Projet :\n" + message.trim() + "\n\n" +
                 "— Envoyé depuis la page d'accueil de " + CONFIG.BRAND;
 
-            /* L'objet n'est pas transmis par wa.me : on le place donc en tête du
-               message pour retrouver la demande d'un coup d'œil dans WhatsApp. */
-            var subject = "[Site] " + need + " — " + name.trim();
-            var full = subject + "\n\n" + text;
-
-            var url = linkForWhatsApp(full, "Demande de projet — " + need + " (" + name.trim() + ")");
+            var waURL = linkForWhatsApp("[Site] " + need + " — " + name.trim() + "\n\n" + text,
+                "Demande de projet — " + need + " (" + name.trim() + ")");
             var hello = firstName(name) ? "Merci " + firstName(name) + " ! " : "Merci ! ";
-            var isWhatsApp = !!buildWhatsAppURL("");
-            var target = isWhatsApp ? CONFIG.WHATSAPP_DISPLAY : CONFIG.EMAIL;
 
-            var opened = null;
-            try {
-                opened = window.open(url, "_blank", "noopener");
-            } catch (err) {
-                opened = null;
+            var submit = $("button[type=submit]", form);
+            var spinner = document.createElement("span");
+            spinner.className = "spin";
+            spinner.setAttribute("aria-hidden", "true");
+
+            function setBusy(busy) {
+                if (!submit) return;
+                submit.setAttribute("aria-busy", busy ? "true" : "false");
+                if (busy) {
+                    submit.insertBefore(spinner, submit.firstChild);
+                } else if (spinner.parentNode) {
+                    spinner.parentNode.removeChild(spinner);
+                }
             }
 
-            /* Onglet bloqué (mode PWA, iOS strict, bloqueur de pop-up) : on
-               propose le lien à cliquer plutôt qu'une confirmation mensongère. */
-            if (opened) {
-                showStatus(hello + (isWhatsApp
-                    ? "votre message s'ouvre dans WhatsApp au " + target + "."
-                    : "votre message s'ouvre dans votre logiciel de messagerie."));
-            } else {
+            /* Sans contact.php (site ouvert en local, ou serveur sans PHP),
+               le navigateur ne saura pas parser la réponse : on bascule
+               directement sur WhatsApp plutôt que d'afficher une erreur. */
+            var canSubmit = window.fetch && form.getAttribute("action");
+
+            setBusy(true);
+
+            function fallbackToWhatsApp(reason) {
+                setBusy(false);
                 var link = document.createElement("a");
-                link.href = url;
+                link.href = waURL;
                 link.target = "_blank";
                 link.rel = "noopener noreferrer";
                 link.className = "form__status-link";
-                link.textContent = isWhatsApp ? "Ouvrir WhatsApp" : "Ouvrir l'e-mail";
-                showStatus(hello + "votre navigateur a bloqué l'ouverture — cliquez ici pour envoyer : ", false);
+                link.textContent = "Envoyer sur WhatsApp";
+                showStatus(hello + (reason || "l'envoi par e-mail a échoué.") + " ", true);
                 statusEl.appendChild(link);
             }
 
-            form.reset();
-            if (phoneInput) phoneInput.removeAttribute("aria-invalid");
+            if (!canSubmit) {
+                fallbackToWhatsApp("L'envoi par e-mail n'est pas disponible ici.");
+                return;
+            }
+
+            var payload = {
+                name: name.trim(),
+                email: email.trim(),
+                phone: phone.intl || phoneRaw.trim(),
+                need: need,
+                message: message.trim(),
+                website: ($("#f-website") || {}).value || "",
+                started_at: startedInput ? startedInput.value : ""
+            };
+
+            fetch(form.getAttribute("action"), {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(function (res) {
+                return res.json().catch(function () {
+                    return { ok: false, message: "Réponse inattendue du serveur." };
+                }).then(function (data) {
+                    return { status: res.status, data: data };
+                });
+            }).then(function (out) {
+                setBusy(false);
+                var data = out.data || {};
+
+                if (data.ok) {
+                    showStatus(data.message || (hello + "votre demande est envoyée."));
+                    form.reset();
+                    if (startedInput) startedInput.value = Date.now();
+                    if (phoneInput) phoneInput.removeAttribute("aria-invalid");
+                    return;
+                }
+
+                /* Champs invalides côté serveur : on les signale un par un. */
+                if (data.errors) {
+                    Object.keys(data.errors).forEach(function (key) {
+                        var input = $("#f-" + (key === "message" ? "msg" : key));
+                        if (input) input.setAttribute("aria-invalid", "true");
+                    });
+                }
+
+                if (out.status === 429 || out.status === 502 || out.status === 500) {
+                    fallbackToWhatsApp(data.message || "L'envoi par e-mail a échoué.");
+                    return;
+                }
+
+                showStatus(data.message || "Merci de vérifier les champs signalés.", true);
+            }).catch(function () {
+                fallbackToWhatsApp("Impossible de joindre le serveur.");
+            });
         });
     }
 
