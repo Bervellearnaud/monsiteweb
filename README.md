@@ -55,8 +55,9 @@ offre, réassurance, action.
    d'interface animée et rangée de trois cartes de synthèse alignées sous la
    maquette (aucune superposition).
 2. **Carrousel technos** — « Les briques que nous maîtrisons » : 11 cartes en
-   défilement horizontal visible, qui avance **automatiquement** toutes les
-   0,8 s, avec pause/lecture, boutons précédent/suivant, compteur « 4–6 / 11 »,
+   défilement horizontal visible, qui avance **automatiquement** avec un
+   arrêt de 2,6 s sur chaque carte (≈ 3,2 s par carte, glissade comprise),
+   avec pause/lecture, boutons précédent/suivant, compteur « 4–6 / 11 »,
    barre de progression, molette, glisser à la souris, balayage tactile et
    navigation clavier.
 3. **Expertises (`#services`)** — web, SEO, e-commerce, data, réseaux et serveurs.
@@ -92,7 +93,7 @@ offre, réassurance, action.
 | Révélations | Animation d'apparition via `IntersectionObserver` |
 | Compteurs | Chiffres du bandeau KPI animés à l'arrivée dans le viewport |
 | Projets | Filtres Web / Applications / Jeux, vignettes, lightbox clavier et tactile |
-| Carrousel technos | Avance automatique (0,8 s par carte, retour au début en fin de liste), pause au survol / focus / molette / glisser, bouton pause-lecture, alignement par carte (`scroll-snap`), compteur et barre de progression |
+| Carrousel technos | Avance automatique (2,6 s d'arrêt par carte + 0,6 s de transition, retour au début en fin de liste), pause au survol / focus / molette / glisser, bouton pause-lecture, alignement par carte (`scroll-snap`), compteur et barre de progression |
 | FAQ | Accordéon natif (`details` / `summary`), une réponse ouverte à la fois |
 | Formulaire | Validation navigateur, ouverture d'un message WhatsApp pré-rempli |
 | WhatsApp | Tous les CTA basculent vers un e-mail pré-rempli tant que `WHATSAPP_NUMBER` est vide |

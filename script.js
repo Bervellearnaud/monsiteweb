@@ -497,8 +497,12 @@
             ? window.matchMedia("(prefers-reduced-motion: reduce)")
             : { matches: false };
 
-        var DELAY = 800;         /* temps d'arrêt sur chaque carte, en ms */
-        var IDLE_RESUME = 2600;  /* reprise après la dernière interaction */
+        /* Cadence de l'avance automatique. Le minuteur ne repart qu'une fois la
+           carte arrivée : la glissade (≈ 0,6 s) ne rogne donc plus le temps de
+           lecture. 2,6 s d'arrêt + 0,6 s de transition ≈ 3,2 s par carte. */
+        var DELAY = 2600;        /* temps d'arrêt sur chaque carte, en ms */
+        var SCROLL_MS = 620;     /* durée approximative de la glissade, en ms */
+        var IDLE_RESUME = 4000;  /* reprise après la dernière interaction */
         var userPaused = false;  /* pause explicite (bouton) ou reduce-motion */
         var inView = true;       /* la section est visible à l'écran */
         var hovering = false;    /* le curseur est sur le carrousel */
@@ -636,9 +640,16 @@
            exactement la fin de la pause au lieu de sonder toutes les 3 s. */
         function scheduleNext() {
             window.clearTimeout(timer);
-            var wait = Math.max(120, interactingUntil - Date.now());
-            if (!blocked()) wait = Math.max(120, wait > 0 ? wait : DELAY);
-            timer = window.setTimeout(tick, wait);
+            var remaining = interactingUntil - Date.now();
+            var wait;
+            if (remaining > 0) {
+                wait = remaining;            /* pause demandée : on la respecte */
+            } else if (blocked()) {
+                wait = 600;                  /* survol, hors écran : on re-sonde */
+            } else {
+                wait = DELAY;                /* cadence normale */
+            }
+            timer = window.setTimeout(tick, Math.max(80, wait));
         }
 
         function tick() {
@@ -650,7 +661,11 @@
             /* à la fin, on revient au début plutôt que de rester en butée */
             if (track.scrollLeft >= maxScroll() - 2) goToIndex(0, true);
             else goToIndex(nextIndex(), true);
-            scheduleNext();
+
+            /* On attend la fin du déplacement avant de relancer le décompte :
+               sinon le temps de lecture est écourté de la durée de la glissade. */
+            window.clearTimeout(timer);
+            timer = window.setTimeout(scheduleNext, reduce.matches ? 0 : SCROLL_MS);
         }
 
         /* Prochaine carte hors écran : l'autoplay avance carte par carte,
@@ -712,10 +727,10 @@
             window.requestAnimationFrame(function () { update(); ticking = false; });
         }, { passive: true });
 
-        /* Après un clic, on laisse 6 s : à 0,8 s par carte, l'avance automatique
-           reprenait avant qu'on ait pu regarder la carte atteinte. */
-        if (prev) prev.addEventListener("click", function () { holdPlayback(6000); step(-1); });
-        if (next) next.addEventListener("click", function () { holdPlayback(6000); step(1); });
+        /* Après un clic, on laisse 8 s : le temps de lire la carte atteinte
+           avant que l'avance automatique ne reprenne. */
+        if (prev) prev.addEventListener("click", function () { holdPlayback(8000); step(-1); });
+        if (next) next.addEventListener("click", function () { holdPlayback(8000); step(1); });
 
         /* Clavier : flèches, Début, Fin, Page précédente/suivante */
         track.addEventListener("keydown", function (e) {
