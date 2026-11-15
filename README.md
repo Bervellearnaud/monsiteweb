@@ -107,16 +107,26 @@ Le haut de `script.js` centralise la configuration :
 
 ```js
 var CONFIG = {
-    WHATSAPP_NUMBER: "",            // ex. "2250700000000" (sans +, espaces ou tirets)
-    EMAIL: "contact@techzen.ci",
+    WHATSAPP_NUMBER: "2250714232871",           // +225 07 14 23 28 71
+    WHATSAPP_DISPLAY: "+225 07 14 23 28 71",    // forme lisible sur le site
+    EMAIL: "techzenc@techzen.ci",
     BRAND: "TechZen"
 };
 ```
 
-- **WhatsApp** : tant que `WHATSAPP_NUMBER` est vide, aucun lien cassé n'est produit :
-  les boutons WhatsApp ouvrent un e-mail pré-rempli à la place.
-- **E-mail** : l'adresse est aussi présente dans les liens `mailto:` de `index.html`.
-  Mettez-la à jour dans les deux endroits.
+Ces coordonnées sont reprises à trois endroits, à garder alignés :
+
+| Où | Quoi |
+| --- | --- |
+| `index.html` — section `#contact` | e-mail, numéro affiché, lien `tel:+2250714232871` |
+| `index.html` — pied de page | e-mail et numéro cliquables |
+| `index.html` — données structurées `ld+json` | `telephone`, `email`, `contactPoint` |
+
+- **WhatsApp** : si `WHATSAPP_NUMBER` est vide, aucun lien cassé n'est produit :
+  les boutons WhatsApp ouvrent un e-mail pré-rempli à la place. Les attributs
+  `data-wa="…"` de `index.html` ne contiennent que le message pré-rempli.
+- **E-mail** : les liens `mailto:` de `index.html` portent l'adresse en clair (utile
+  pour les visiteurs sans JavaScript).
 - **Marque** : `BRAND` est disponible pour les évolutions JS ; le texte visible est
   principalement dans `index.html`.
 

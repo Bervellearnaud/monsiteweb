@@ -2444,6 +2444,16 @@ html[data-theme="dark"] .method__ico { color: var(--brand-soft); }
 .method small { display: block; font-size: .7rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
 .method strong { font-size: .92rem; color: var(--ink); font-weight: 600; }
 
+/* Libellé du canal puis coordonnée : la valeur reste sur une seule ligne,
+   jamais coupée au milieu d'un numéro. */
+.method__txt { display: grid; gap: .1rem; min-width: 0; }
+.method__txt strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 420px) {
+    .method { gap: .7rem; padding: .7rem .8rem; }
+    .method__ico { width: 34px; height: 34px; }
+    .method strong { font-size: .85rem; }
+}
+
 .form {
     display: grid;
     gap: .8rem;
