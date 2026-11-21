@@ -66,6 +66,10 @@ offre, réassurance, action.
    cartes partagent le même principe d'affiche : titre, accroche et badges à gauche,
    maquette multi-écrans à droite. Paintball 2D et Puzzle Studio utilisent en plus
    une variante verticale (`*-cover-tall.webp`) sous 620 px via `<picture>`.
+   Les technologies ne sont plus répétées en pastilles sous le texte : elles sont
+   déjà annoncées dans le paragraphe et, pour l'essentiel, dans les mots-clés des
+   affiches. Les cartes gardent le badge d'état (« Jouable ici », « Démo
+   interactive »), la galerie de vignettes et les boutons d'action.
 5. **Chiffres clés** — bandeau sombre : délai de réponse, étendue des expertises,
    sur-mesure et interlocuteur unique.
 6. **Croissance / SEO (`#croissance`)** — visibilité Google, acquisition locale,
