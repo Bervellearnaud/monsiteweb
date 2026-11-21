@@ -1482,18 +1482,6 @@ html[data-theme="dark"] .project__badge { color: #63d99b; }
 .project h3 { font-size: clamp(1.12rem, 1rem + .5vw, 1.4rem); }
 .project p { font-size: .93rem; }
 
-.project__tags { display: flex; flex-wrap: wrap; gap: .35rem; }
-
-.tag {
-    font-size: .7rem;
-    font-weight: 500;
-    padding: .22rem .6rem;
-    border-radius: 999px;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    color: var(--text);
-}
-
 .project__actions {
     display: flex;
     flex-wrap: wrap;
@@ -2842,8 +2830,7 @@ html[data-theme="dark"] .step__num { color: #fff; }
     -webkit-backdrop-filter: blur(10px);
 }
 
-.chip,
-.tag {
+.chip {
     border-color: color-mix(in srgb, var(--brand) 12%, var(--line));
     background: color-mix(in srgb, var(--surface) 80%, var(--surface-2));
 }
